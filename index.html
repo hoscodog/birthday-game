@@ -3,15 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Don't Turn Off the Lights</title>
+  <title>The Night Shift</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23e03b2f%22/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <canvas id="game"></canvas>
-  <div id="overlay">
-    <h1>Don't Turn Off the Lights</h1>
-    <p>Click to begin…</p>
+
+  <div id="hud" class="hidden">
+    <div id="hud-top-left">
+      <div id="room-name"></div>
+      <div id="clock">3:04 AM</div>
+    </div>
+    <div id="hud-top-right">
+      <span class="hud-label">FLASHLIGHT</span>
+      <div id="battery"><div id="battery-fill"></div></div>
+    </div>
+    <div id="inventory"></div>
+    <button id="journal-btn" type="button">Pages 0/6</button>
   </div>
+
+  <div id="toast"></div>
+
+  <div id="dialog" class="hidden">
+    <div id="dialog-box">
+      <p id="dialog-text"></p>
+      <span class="dialog-hint">click to continue</span>
+    </div>
+  </div>
+
+  <div id="modal" class="hidden">
+    <div id="modal-card"></div>
+  </div>
+
+  <div id="fade"><p id="fade-text"></p></div>
+
+  <div id="intro">
+    <div id="intro-stage-1">
+      <div class="pager">
+        <div class="pager-screen"><span class="blink">1 NEW PAGE</span></div>
+      </div>
+      <p class="intro-hint">Your pager is going off. Click to answer.</p>
+      <p class="intro-small">Best with headphones and the lights off.</p>
+    </div>
+    <div id="intro-stage-2" class="hidden">
+      <h1>THE NIGHT SHIFT</h1>
+      <div id="page-lines"></div>
+      <div id="intro-buttons" class="hidden">
+        <button id="btn-continue" type="button" class="hidden">Continue shift</button>
+        <button id="btn-start" type="button">Clock in</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
