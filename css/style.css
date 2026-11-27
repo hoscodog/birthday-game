@@ -187,8 +187,6 @@ button.ghost:hover { color: var(--ink); }
 #intro-buttons { display: flex; gap: 14px; }
 
 /* surgical count */
-.count-list button { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; }
-.count-list b { color: #d9c27a; }
 
 /* final screen */
 .paper.final { transform: rotate(0.5deg); }

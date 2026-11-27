@@ -57,17 +57,17 @@ const BOARD = { x: 960, y: 80, w: 580, h: 270 };
 const BACK = { x: 900, y: 470, w: 660, h: 220 };
 const HAND_AT = { x: 820, y: 470 };
 
-// The count: what the sheet says went onto the field vs. what's on the back table now.
+// The count sheet: what went onto the field. Note what isn't on it.
 const COUNT = [
-  ['Raytec sponges', 10, 10],
-  ['Lap sponges', 5, 5],
-  ['Kelly clamps', 6, 5],
-  ['Mosquito clamps', 4, 4],
-  ['Needle drivers', 2, 2],
-  ['Metzenbaum scissors', 1, 1],
-  ['Mayo scissors', 1, 1],
-  ['Adson forceps', 2, 2],
-  ['#10 blade', 1, 1],
+  ['Raytec sponges', 10],
+  ['Lap sponges', 5],
+  ['Kelly clamps', 6],
+  ['Mosquito clamps', 4],
+  ['Needle drivers', 2],
+  ['Metzenbaum scissors', 1],
+  ['Mayo scissors', 1],
+  ['Adson forceps', 2],
+  ['#10 blade', 1],
 ];
 
 /* ---------- instruments, top-down on the back table ---------- */
@@ -105,42 +105,342 @@ function blade(c, x, y) {
   c.beginPath(); c.moveTo(x - 3, y - 4); c.quadraticCurveTo(x - 8, y - 22, x + 1, y - 30); c.lineTo(x + 3, y - 4); c.closePath(); c.fill();
 }
 
-function drawBackTable(c) {
-  const { x, y, w, h } = BACK;
-  c.fillStyle = '#2c4f6e';
-  rr(c, x, y, w, h, 6);
+/* ---------- things that have no business on a sterile field ---------- */
+function knifePath(c) {
+  c.beginPath();
+  c.moveTo(78, -11);
+  c.lineTo(250, -4);
+  c.quadraticCurveTo(226, 14, 78, 15);
+  c.closePath();
+}
+// A big kitchen knife, top-down, butt of the handle at (x, y), pointing along rot.
+function kitchenKnife(c, x, y, rot = 0, s = 1) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.scale(s, s);
+  c.fillStyle = '#1e1a17';
+  rr(c, 0, -9, 72, 18, 7);
   c.fill();
-  c.fillStyle = '#244560';
-  c.fillRect(x, y + h - 10, w, 60);
-  c.fillStyle = '#8c9296';
-  c.fillRect(x + 30, y + h + 50, 12, 110);
-  c.fillRect(x + w - 42, y + h + 50, 12, 110);
-  // row 1: Kelly clamps (5 of them) + mosquitos (4)
-  for (let k = 0; k < 5; k++) ringed(c, x + 40 + k * 34, y + 30, 58, 'clamp');
-  for (let k = 0; k < 4; k++) ringed(c, x + 250 + k * 28, y + 34, 48, 'mosquito');
+  c.fillStyle = '#c9d0d4';
+  [16, 36, 56].forEach((rx) => { c.beginPath(); c.arc(rx, 0, 2.6, 0, Math.PI * 2); c.fill(); });
+  c.fillStyle = '#9aa0a4';
+  c.fillRect(70, -11, 9, 26);
+  c.fillStyle = '#dfe5e8';
+  knifePath(c);
+  c.fill();
+  c.strokeStyle = 'rgba(255,255,255,0.7)';
+  c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(84, -8); c.lineTo(238, -4); c.stroke();
+  c.restore();
+}
+// Where the knife was: a dent in the drape, and a faint outline.
+function knifeGhost(c, x, y) {
+  c.save();
+  c.translate(x, y);
+  c.fillStyle = 'rgba(10,20,30,0.28)';
+  rr(c, 0, -9, 72, 18, 7);
+  c.fill();
+  knifePath(c);
+  c.fill();
+  c.setLineDash([6, 5]);
+  c.strokeStyle = 'rgba(200,215,225,0.35)';
+  c.lineWidth = 2;
+  c.stroke();
+  c.restore();
+}
+function hatchet(c, x, y, rot) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.fillStyle = '#7a5230';
+  rr(c, 0, -6, 172, 12, 5);
+  c.fill();
+  c.strokeStyle = '#5c3c22';
+  c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(10, -2); c.lineTo(150, -1); c.stroke();
+  c.fillStyle = '#6f777c';
+  c.fillRect(140, -11, 38, 22);
+  c.fillStyle = '#9ea7ac';
+  c.beginPath(); c.moveTo(144, 10); c.lineTo(174, 10); c.lineTo(192, 54); c.quadraticCurveTo(160, 68, 126, 54); c.closePath(); c.fill();
+  c.strokeStyle = '#e3e9ec';
+  c.lineWidth = 2.5;
+  c.beginPath(); c.moveTo(192, 54); c.quadraticCurveTo(160, 68, 126, 54); c.stroke();
+  c.fillStyle = 'rgba(120,8,8,0.85)';
+  c.beginPath(); c.ellipse(170, 56, 12, 5, 0.2, 0, Math.PI * 2); c.fill();
+  c.restore();
+}
+function bullets(c, x, y) {
+  for (let k = 0; k < 6; k++) {
+    const bx = x + k * 16;
+    c.fillStyle = '#c9a23f';
+    c.fillRect(bx - 3.5, y + 6, 7, 14);
+    c.fillStyle = '#e3c76a';
+    c.fillRect(bx - 3.5, y + 6, 2, 14);
+    c.fillStyle = '#b8663a';
+    c.beginPath(); c.ellipse(bx, y + 6, 3.5, 6, 0, Math.PI, 0); c.fill();
+  }
+}
+function boneSaw(c, x, y) {
+  c.save();
+  c.translate(x, y);
+  c.fillStyle = '#5a3b24';
+  rr(c, -13, 52, 26, 40, 8);
+  c.fill();
+  c.fillStyle = '#2c4f6e';
+  rr(c, -6, 60, 12, 22, 5);
+  c.fill();
+  c.fillStyle = '#b9c1c5';
+  c.fillRect(-10, -6, 18, 60);
+  c.fillStyle = '#8e979c';
+  c.fillRect(-12, -6, 5, 60); // spine
+  c.fillStyle = '#b9c1c5';
+  c.beginPath();
+  for (let k = 0; k < 10; k++) { c.moveTo(8, -6 + k * 6); c.lineTo(13, -3 + k * 6); c.lineTo(8, k * 6); }
+  c.fill();
+  c.fillStyle = 'rgba(120,8,8,0.8)';
+  c.fillRect(8, 30, 5, 14);
+  c.restore();
+}
+function cleaver(c, x, y) {
+  c.save();
+  c.translate(x, y);
+  c.fillStyle = '#1e1a17';
+  rr(c, -5, 56, 10, 40, 4);
+  c.fill();
+  c.fillStyle = '#aab3b7';
+  rr(c, -18, -6, 36, 64, 3);
+  c.fill();
+  c.fillStyle = '#e3e9ec';
+  c.fillRect(14, -6, 4, 64); // edge
+  c.fillStyle = '#2c4f6e';
+  c.beginPath(); c.arc(-9, 4, 4, 0, Math.PI * 2); c.fill();
+  c.fillStyle = 'rgba(120,8,8,0.75)';
+  c.beginPath(); c.ellipse(12, 40, 5, 10, 0, 0, Math.PI * 2); c.fill();
+  c.restore();
+}
+function meatHook(c, x, y) {
+  c.save();
+  c.translate(x, y);
+  c.strokeStyle = '#8e979c';
+  c.lineWidth = 5;
+  c.lineCap = 'round';
+  c.beginPath();
+  c.arc(0, 14, 14, Math.PI, 0);
+  c.lineTo(14, 74);
+  c.arc(0, 74, 14, 0, Math.PI * 0.95);
+  c.lineTo(-15, 62);
+  c.stroke();
+  c.fillStyle = '#b9c1c5';
+  c.beginPath(); c.moveTo(-18, 64); c.lineTo(-14, 52); c.lineTo(-11, 64); c.closePath(); c.fill(); // the point
+  c.fillStyle = 'rgba(120,8,8,0.85)';
+  c.beginPath(); c.ellipse(4, 92, 4, 7, 0, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.ellipse(5, 104, 2.5, 4, 0, 0, Math.PI * 2); c.fill();
+  c.restore();
+}
+function handprint(c, x, y) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(-0.25);
+  c.fillStyle = 'rgba(128,10,10,0.85)';
+  c.beginPath(); c.ellipse(0, 6, 15, 13, 0, 0, Math.PI * 2); c.fill();
+  [[-13, -6, -0.6, 10], [-6, -14, -0.15, 14], [2, -16, 0, 15], [9, -13, 0.15, 13]].forEach(([fx, fy, r, l]) => {
+    c.save(); c.translate(fx, fy); c.rotate(r);
+    c.beginPath(); c.ellipse(0, -l / 2 + 6, 3.6, l / 2 + 2, 0, 0, Math.PI * 2); c.fill();
+    c.restore();
+  });
+  c.beginPath(); c.ellipse(15, 8, 3.6, 9, 1.0, 0, Math.PI * 2); c.fill(); // thumb
+  c.restore();
+}
+
+// The back table top, in its own coordinates (0..660 by 0..220). `diff` holds whatever has changed.
+const KNIFE_AT = [36, 197];
+function drawBackTable(c, diff = {}) {
+  const w = BACK.w;
+  const h = BACK.h;
+  c.fillStyle = '#2c4f6e';
+  rr(c, 0, 0, w, h, 6);
+  c.fill();
+  c.fillStyle = '#284a68';
+  c.fillRect(0, h - 10, w, 10);
+  // row 1: Kelly clamps (6) + mosquitos (4)
+  for (let k = 0; k < 6; k++) ringed(c, 40 + k * 34, 30, 58, 'clamp');
+  for (let k = 0; k < 4; k++) ringed(c, 250 + k * 28, 34, 48, 'mosquito');
+  if (diff.bullets) bullets(c, 252, 96);
   // needle drivers, scissors, forceps, blade
-  ringed(c, x + 400, y + 30, 60, 'driver');
-  ringed(c, x + 436, y + 30, 60, 'driver');
-  ringed(c, x + 486, y + 30, 54, 'scissors'); // Metz (long, fine)
-  ringed(c, x + 526, y + 36, 42, 'scissors'); // Mayo (shorter)
-  forceps(c, x + 572, y + 30);
-  forceps(c, x + 594, y + 30);
-  blade(c, x + 628, y + 40);
+  ringed(c, 400, 30, 60, 'driver');
+  if (diff.cleaver) cleaver(c, 436, 30); else ringed(c, 436, 30, 60, 'driver');
+  if (diff.saw) boneSaw(c, 486, 30); else ringed(c, 486, 30, 54, 'scissors'); // Metz (long, fine)
+  if (diff.mayo) {
+    c.save(); c.translate(526, 57); c.rotate(Math.PI); c.translate(-526, -57);
+    ringed(c, 526, 36, 42, 'scissors');
+    c.restore();
+  } else ringed(c, 526, 36, 42, 'scissors'); // Mayo (shorter)
+  forceps(c, 572, 30);
+  forceps(c, 594, 30);
+  blade(c, diff.blade ? 366 : 628, 40);
   // row 2: raytecs (10) + laps (5)
   for (let k = 0; k < 10; k++) {
-    c.fillStyle = '#ecebe4';
-    c.fillRect(x + 30 + k * 30, y + 130, 24, 30);
-    c.fillStyle = '#3b6fa8';
-    c.fillRect(x + 30 + k * 30, y + 141, 24, 4);
+    const bloody = diff.raytec && k === 6;
+    c.fillStyle = bloody ? '#8a1414' : '#ecebe4';
+    c.fillRect(30 + k * 30, 130, 24, 30);
+    c.fillStyle = bloody ? '#5e0b0b' : '#3b6fa8';
+    c.fillRect(30 + k * 30, 141, 24, 4);
   }
   for (let k = 0; k < 5; k++) {
     c.fillStyle = '#ecebe4';
-    c.fillRect(x + 350 + k * 58, y + 120, 50, 54);
+    c.fillRect(350 + k * 58, 120, 50, 54);
     c.fillStyle = '#3b6fa8';
-    c.fillRect(x + 350 + k * 58, y + 124, 50, 6);
+    c.fillRect(350 + k * 58, 124, 50, 6);
     c.fillStyle = '#4f8f4a';
-    c.fillRect(x + 386 + k * 58, y + 162, 10, 8);
+    c.fillRect(386 + k * 58, 162, 10, 8);
   }
+  // row 3: the kitchen knife. It isn't on the count sheet. It shouldn't be here at all.
+  if (diff.knife) knifeGhost(c, ...KNIFE_AT); else kitchenKnife(c, ...KNIFE_AT);
+  if (diff.hand) handprint(c, 612, 192);
+  if (diff.hatchet) hatchet(c, 380, 168, -0.25);
+  if (diff.hook) meatHook(c, 662, 50);
+}
+
+// What can change, and where to click for it (table coordinates). The knife always goes missing.
+const DIFFS = {
+  knife: { rects: [{ x: 26, y: 180, w: 270, h: 36 }], line: 'The kitchen knife is gone.' },
+  raytec: { rects: [{ x: 206, y: 124, w: 36, h: 42 }], line: 'A raytec soaked through red.' },
+  mayo: { rects: [{ x: 508, y: 0, w: 36, h: 112 }], line: 'The Mayos are flipped.' },
+  blade: { rects: [{ x: 352, y: 0, w: 28, h: 98 }, { x: 614, y: 0, w: 28, h: 98 }], line: 'The #10 blade moved.' },
+  hand: { rects: [{ x: 592, y: 160, w: 56, h: 58 }], line: 'A bloody handprint on the drape.' },
+  hatchet: { rects: [{ x: 508, y: 112, w: 82, h: 84 }, { x: 370, y: 128, w: 138, h: 56 }], line: 'A hatchet. On your back table.' },
+  bullets: { rects: [{ x: 240, y: 94, w: 110, h: 30 }], line: 'Six bullets, lined up like instruments.' },
+  saw: { rects: [{ x: 468, y: 0, w: 38, h: 126 }], line: 'A bone saw where the Metz should be.' },
+  hook: { rects: [{ x: 640, y: 30, w: 54, h: 130 }], line: 'A meat hook, hanging off the edge.' },
+  cleaver: { rects: [{ x: 416, y: 0, w: 40, h: 128 }], line: 'A cleaver where a needle driver was.' },
+};
+const SURGICAL = ['raytec', 'mayo', 'blade', 'hand'];
+const HORROR = ['hatchet', 'bullets', 'saw', 'hook', 'cleaver'];
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+/* ---------- the close-up count ---------- */
+// The back table blown up to fill the screen.
+const ZS = 2.2;
+const ZX = (1600 - BACK.w * ZS) / 2 - 20;
+const ZY = 200;
+const toView = (r) => ({ x: ZX + r.x * ZS, y: ZY + r.y * ZS, w: r.w * ZS, h: r.h * ZS });
+const STEP_BACK = { x: 60, y: 760, w: 240, h: 64 };
+const GOT_IT = { x: 1300, y: 760, w: 240, h: 64 };
+const LOOK_MS = 9000;
+const DARK_MS = 1700;
+
+// phase: off | look | dark | find | done. Kept out of the save; a reload just puts the table back.
+let view = { phase: 'off', diffs: [], found: [], t0: 0, flashUntil: 0 };
+const counting = () => view.phase !== 'off';
+
+function button(c, r, label) {
+  c.fillStyle = 'rgba(20,24,28,0.85)';
+  rr(c, r.x, r.y, r.w, r.h, 10);
+  c.fill();
+  c.strokeStyle = 'rgba(239,228,204,0.5)';
+  c.lineWidth = 2;
+  c.stroke();
+  text(c, label, r.x + r.w / 2, r.y + r.h / 2, { size: 24, color: '#efe4cc' });
+}
+
+function drawCloseUp(c, t) {
+  c.fillStyle = '#0d1114';
+  c.fillRect(0, 0, 1600, 900);
+  if (view.phase === 'dark') return;
+  const shown = {};
+  if (view.phase === 'find') view.diffs.forEach((k) => { shown[k] = true; });
+  if (view.phase === 'done') shown.knife = true;
+  c.save();
+  c.translate(ZX, ZY);
+  c.scale(ZS, ZS);
+  drawBackTable(c, shown);
+  c.restore();
+  // red marker circles round what she's found
+  c.strokeStyle = '#d41c22';
+  c.lineWidth = 5;
+  view.found.forEach((k) => {
+    const r = toView(DIFFS[k].rects[0]);
+    c.beginPath();
+    c.ellipse(r.x + r.w / 2, r.y + r.h / 2, r.w / 2 + 14, r.h / 2 + 14, -0.04, 0, Math.PI * 2);
+    c.stroke();
+  });
+  text(c, 'FINAL COUNT · BACK TABLE', 160, 84, { size: 30, color: '#efe4cc', align: 'left' });
+  if (view.phase === 'look') {
+    text(c, 'Take a good look. Everything’s where it should be… for now.', 160, 134, { size: 30, color: '#d9c27a', align: 'left', font: HAND });
+    const left = Math.max(0, 1 - (t - view.t0) / LOOK_MS);
+    c.fillStyle = 'rgba(217,194,122,0.6)';
+    c.fillRect(160, 164, 500 * left, 4);
+    button(c, GOT_IT, 'I’ve got it');
+  } else if (view.phase === 'find') {
+    text(c, 'Something changed. Find what’s different.', 160, 134, { size: 30, color: '#e07a6a', align: 'left', font: HAND });
+    text(c, `${view.found.length} / ${view.diffs.length}`, 1540, 100, { size: 34, color: '#e07a6a', align: 'right' });
+  } else if (view.phase === 'done') {
+    text(c, 'Everything’s back. Except the knife.', 160, 134, { size: 30, color: '#e07a6a', align: 'left', font: HAND });
+  }
+  if (view.phase === 'look' || view.phase === 'find') button(c, STEP_BACK, 'Step back');
+  // the flicker after a wrong call
+  if (t < view.flashUntil && Math.random() < 0.6) {
+    c.fillStyle = 'rgba(0,0,0,0.92)';
+    c.fillRect(0, 0, 1600, 900);
+  }
+}
+
+function startCount(g) {
+  if (g.flag('orCounted')) {
+    g.say(['Everything on the back table is where it should be. Lined up neat, just how you like it. Minus one kitchen knife.']);
+    return;
+  }
+  view = { phase: 'look', diffs: [], found: [], t0: performance.now(), flashUntil: 0 };
+  if (!g.flag('countHowTo')) {
+    g.set('countHowTo');
+    g.ui.toast('Memorize the table. When the lights come back, find what changed.');
+  }
+}
+
+function goDark(g) {
+  view.phase = 'dark';
+  view.t0 = performance.now();
+  view.diffs = ['knife', pick(SURGICAL), pick(HORROR)];
+  view.found = [];
+  g.audio.breaker();
+  g.audio.whisper();
+  setTimeout(() => g.audio.heartbeat(), 500);
+}
+
+function missed(g) {
+  g.audio.wrong();
+  g.audio.whisper();
+  g.shake(160);
+  g.ui.toast('“From the top.”');
+  view = { phase: 'look', diffs: [], found: [], t0: performance.now(), flashUntil: performance.now() + 450 };
+}
+
+function foundDiff(g, k) {
+  view.found.push(k);
+  g.audio.beep(1, 0.08);
+  g.ui.toast(DIFFS[k].line);
+  if (view.found.length < view.diffs.length) return;
+  view.phase = 'done';
+  view.t0 = performance.now();
+  setTimeout(() => {
+    view.phase = 'off';
+    countFound(g);
+  }, 1400);
+}
+
+function closeUpSpots(g) {
+  if (view.phase === 'dark' || view.phase === 'done') return [];
+  // Hidden labels so the hover tooltip doesn't give away the answers.
+  const spots = [{ x: 0, y: 0, w: 1600, h: 900, label: '', click: () => { if (view.phase === 'find') missed(g); } }];
+  if (view.phase === 'find') {
+    view.diffs.filter((k) => !view.found.includes(k)).forEach((k) => {
+      DIFFS[k].rects.forEach((r) => spots.push({ ...toView(r), label: '', click: () => foundDiff(g, k) }));
+    });
+  }
+  if (view.phase === 'look') spots.push({ ...GOT_IT, label: 'I’ve got it', click: () => goDark(g) });
+  spots.push({ ...STEP_BACK, label: 'Step back', click: () => { view.phase = 'off'; } });
+  return spots;
 }
 
 const background = cached((c) => {
@@ -219,7 +519,12 @@ const background = cached((c) => {
   c.lineWidth = 3;
   c.beginPath(); c.moveTo(BOARD.x + 290, BOARD.y + 10); c.lineTo(BOARD.x + 290, BOARD.y + BOARD.h - 10); c.stroke();
 
-  drawBackTable(c);
+  // back table legs and the drape hanging off the front (the top is drawn per frame)
+  c.fillStyle = '#8c9296';
+  c.fillRect(BACK.x + 30, BACK.y + BACK.h + 50, 12, 110);
+  c.fillRect(BACK.x + BACK.w - 42, BACK.y + BACK.h + 50, 12, 110);
+  c.fillStyle = '#244560';
+  c.fillRect(BACK.x, BACK.y + BACK.h - 4, BACK.w, 54);
 });
 
 function drawBoard(c, g) {
@@ -242,19 +547,21 @@ function drawBoard(c, g) {
   // count sheet
   const R = BOARD.x + 308;
   text(c, 'COUNT', R, BOARD.y + 26, { size: 22, color: '#7a1010', align: 'left', font: HAND });
-  text(c, g.flag('orCounted') || party ? 'final: ✓' : 'final: ???', R + 160, BOARD.y + 26, { size: 18, color: '#7a1010', align: 'left', font: HAND });
+  text(c, g.has('Kitchen knife') || party ? 'final: ✓' : 'final: ???', R + 160, BOARD.y + 26, { size: 18, color: '#7a1010', align: 'left', font: HAND });
   COUNT.forEach(([name, n], i) => {
-    text(c, name, R, BOARD.y + 54 + i * 23, { size: 18, color: ink, align: 'left', font: HAND });
-    text(c, String(n), R + 240, BOARD.y + 54 + i * 23, { size: 18, color: ink, align: 'right', font: HAND });
+    text(c, name, R, BOARD.y + 50 + i * 22, { size: 18, color: ink, align: 'left', font: HAND });
+    text(c, String(n), R + 240, BOARD.y + 50 + i * 22, { size: 18, color: ink, align: 'right', font: HAND });
   });
+  // added in red, in handwriting that isn't yours, once she's called it
+  if (g.flag('orCounted')) {
+    const y = BOARD.y + 50 + COUNT.length * 22;
+    text(c, 'Kitchen knife', R, y, { size: 19, color: '#b3241f', align: 'left', font: HAND, rot: -0.03 });
+    text(c, '1', R + 240, y, { size: 19, color: '#b3241f', align: 'right', font: HAND });
+  }
 }
 
-function drawClamp(c, x, y) {
-  c.save();
-  c.translate(x, y);
-  c.rotate(-1.2);
-  ringed(c, 0, 0, 52, 'clamp');
-  c.restore();
+function drawFloorKnife(c, x, y) {
+  kitchenKnife(c, x - 80, y + 14, -0.12, 0.62);
 }
 
 function sittingCat(c, x, y, s) {
@@ -390,14 +697,27 @@ function drawParty(c, t, g) {
   candle(c, cx + 22, cy - 120, 34, true, t, 2);
   text(c, '2', cx - 22, cy - 138, { size: 18, color: '#3b6fa8' });
   text(c, '9', cx + 22, cy - 138, { size: 18, color: '#3b6fa8' });
-  // the card
-  c.save();
-  c.translate(cx + 120, cy - 14);
-  c.rotate(0.12);
-  c.fillStyle = '#efe6c0';
-  c.fillRect(-26, -40, 52, 40);
-  text(c, 'Debbie', 0, -20, { size: 16, color: '#5a1010', font: HAND });
-  c.restore();
+  if (g.flag('cakeCut')) {
+    // a slice out of the front, the card that was baked inside, the slice on a plate and the knife
+    c.fillStyle = '#f6e2b8';
+    c.fillRect(cx + 34, cy - 70, 40, 66);
+    c.fillStyle = '#c23a5a';
+    c.fillRect(cx + 34, cy - 42, 40, 6);
+    c.save();
+    c.translate(cx + 54, cy - 70);
+    c.rotate(0.1);
+    c.fillStyle = '#efe6c0';
+    c.fillRect(-20, -34, 40, 36);
+    text(c, 'Debbie', 0, -16, { size: 14, color: '#5a1010', font: HAND });
+    c.restore();
+    c.fillStyle = '#f4f1ea';
+    c.beginPath(); c.ellipse(cx + 160, cy + 2, 40, 9, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#f3c6d8';
+    c.beginPath(); c.moveTo(cx + 134, cy - 2); c.lineTo(cx + 186, cy - 2); c.lineTo(cx + 186, cy - 34); c.closePath(); c.fill();
+    c.fillStyle = '#c23a5a';
+    c.fillRect(cx + 160, cy - 18, 26, 4);
+    kitchenKnife(c, cx - 230, cy + 4, 0.02, 0.6);
+  }
   // Dio on the breaker panel, in a hat he hates
   sittingCat(c, 365, 250, 0.9);
   // the dogs, very proud of themselves
@@ -433,11 +753,15 @@ let partyAt = -1e9;
 export default {
   name: 'OR 1',
 
-  safe: (g) => g.flag('blackout'),
-  flashlight: (g) => !g.flag('blackout'),
-  darkness: (g) => (g.flag('party') ? 0 : g.flag('blackout') ? 1 : 0.97),
+  safe: (g) => g.flag('blackout') || counting(),
+  flashlight: (g) => !g.flag('blackout') && view.phase !== 'dark',
+  darkness: (g) => {
+    if (counting()) return view.phase === 'dark' ? 1 : 0;
+    return g.flag('party') ? 0 : g.flag('blackout') ? 1 : 0.97;
+  },
 
   enter(g) {
+    view.phase = 'off';
     loadSpotify();
     if (g.flag('party')) showPlayer();
     if (g.flag('blackout')) {
@@ -445,7 +769,7 @@ export default {
       g.audio.ambientLevel(0, 0.5);
     }
     if (g.flag('party')) {
-      g.ui.toast('The party’s still going. Click the card on the cake.');
+      g.ui.toast(g.flag('cakeCut') ? 'The party’s still going. Click the card in the cake.' : 'The party’s still going. Cut the cake.');
       return;
     }
     if (!g.flag('orIntro')) {
@@ -459,6 +783,11 @@ export default {
   },
 
   update(t, g) {
+    if (view.phase === 'look' && t - view.t0 > LOOK_MS && !g.ui.busy()) goDark(g);
+    if (view.phase === 'dark' && t - view.t0 > DARK_MS) {
+      view.phase = 'find';
+      g.audio.lightsOn();
+    }
     if (g.flag('blackout') && !g.flag('party') && t > nextScratch && !g.ui.busy()) {
       g.audio.scratch();
       if (Math.random() < 0.5) g.audio.pant();
@@ -467,9 +796,17 @@ export default {
   },
 
   draw(c, t, g) {
+    if (counting()) {
+      drawCloseUp(c, t);
+      return;
+    }
     background(c);
     drawBoard(c, g);
-    if (g.flag('clampUnderDoor') && !g.has('Kelly clamp')) drawClamp(c, UNDER_DOOR.x + 60, UNDER_DOOR.y + 30);
+    c.save();
+    c.translate(BACK.x, BACK.y);
+    drawBackTable(c, { knife: g.flag('orCounted') });
+    c.restore();
+    if (g.flag('knifeUnderDoor') && !g.has('Kitchen knife')) drawFloorKnife(c, UNDER_DOOR.x + 60, UNDER_DOOR.y + 30);
     if (g.flag('party')) {
       drawParty(c, t, g);
       return;
@@ -491,6 +828,7 @@ export default {
   },
 
   lights(t, g) {
+    if (counting()) return view.phase === 'dark' ? [] : [{ x: 800, y: 440, r: 900, a: 0.9 }];
     if (g.flag('party')) return [];
     if (g.flag('blackout')) {
       // only the hand is visible
@@ -505,6 +843,7 @@ export default {
   },
 
   hotspots(g) {
+    if (counting()) return closeUpSpots(g);
     if (g.flag('party')) return partySpots(g);
     if (g.flag('blackout')) {
       return [{ x: HAND_AT.x - 140, y: HAND_AT.y - 160, w: 260, h: 320, label: 'The hand', click: () => handshake(g) }];
@@ -515,9 +854,9 @@ export default {
       { ...LIGHT, label: 'Surgical light', click: () => g.say(['The big light hums and flickers, aimed at an empty table.']) },
       { ...TABLE, label: 'OR table', click: () => g.say(['The table is made up and ready. No patient.', 'Unless the patient is you.']) },
       { ...BOARD, label: 'Whiteboard', click: () => clickBoard(g) },
-      { ...BACK, label: 'Back table', click: () => openCount(g) },
+      { ...BACK, label: 'Back table', click: () => startCount(g) },
     ];
-    if (g.flag('clampUnderDoor') && !g.has('Kelly clamp')) spots.push({ ...UNDER_DOOR, label: 'Kelly clamp', click: () => takeClamp(g) });
+    if (g.flag('knifeUnderDoor') && !g.has('Kitchen knife')) spots.push({ ...UNDER_DOOR, label: 'Kitchen knife', click: () => takeKnife(g) });
     return spots;
   },
 };
@@ -527,70 +866,42 @@ function clickBoard(g) {
     g.say(['PATIENT: D. DOMINGUEZ. DOB 11/29/1997. PROCEDURE: smudged out.', 'The count sheet is filled in, but nobody signed off on the final count.', 'Check it against the back table.']);
     return;
   }
-  g.say(['The count’s written up. Six Kelly clamps went on the field. Now they’re all accounted for.']);
-}
-
-function openCount(g) {
-  if (g.flag('orCounted')) {
-    g.say(['Everything on the back table is where it should be. Lined up neat, just how you like it.']);
-    return;
-  }
-  const html = `
-    <h2>FINAL COUNT · OR 1</h2>
-    <p class="sub">Count what’s on the back table against the sheet.<br>Which count is off?</p>
-    <div class="seq-buttons count-list">
-      ${COUNT.map(([name, n], i) => `<button type="button" data-i="${i}"><span>${name}</span><b>${n}</b></button>`).join('')}
-    </div>
-    <button type="button" class="ghost" id="ct-x">Go look at the table again</button>`;
-  g.ui.custom(html, (card, close) => {
-    card.querySelector('#ct-x').onclick = close;
-    card.querySelectorAll('[data-i]').forEach((b) => {
-      b.onclick = () => {
-        const i = Number(b.dataset.i);
-        if (COUNT[i][1] === COUNT[i][2]) {
-          g.audio.wrong();
-          b.disabled = true;
-          g.ui.toast(`${COUNT[i][0]}: ${COUNT[i][2]} on the table. That one’s right.`);
-          return;
-        }
-        close();
-        countFound(g);
-      };
-    });
-  });
+  g.say(['Someone has added a line to the bottom of the count, in red, in handwriting that isn’t yours.', 'KITCHEN KNIFE · 1.']);
 }
 
 function countFound(g) {
   g.set('orCounted');
   g.audio.beep(2, 0.08);
   g.say([
-    'Kelly clamps. The sheet says six. There are five on the table.',
-    'One clamp is missing. You say it out loud, like you would on any case: “Count is off. We’re missing a Kelly.”',
-    'The room goes very still.',
+    'You run the count again. Sponges, sharps, instruments. Everything is back where it was.',
+    'Everything except the knife.',
+    'You say it out loud, like you would on any case: “Count is off. We’re missing… a kitchen knife?”',
+    'It was never on the sheet. It was never supposed to be on the field. But it was there, and now it isn’t.',
+    'Behind you, the marker on the whiteboard squeaks.',
   ], () => {
     g.audio.scratch();
     setTimeout(() => g.audio.pant(), 600);
-    g.set('clampUnderDoor');
+    g.set('knifeUnderDoor');
     g.shake(200);
     g.say([
       'Then: scratching. Right at the doors, down low. Something breathing hard on the other side.',
-      'With a metal clink, something slides in under the doors and spins to a stop on the tile.',
-      'A Kelly clamp.',
+      'With a clatter, something slides in under the doors and spins to a stop on the tile.',
+      'The kitchen knife.',
     ]);
   });
 }
 
-function takeClamp(g) {
-  g.give('Kelly clamp');
-  g.say(['You pick up the clamp. Six of six. The count is right.', 'Whatever is behind those doors gave it back. Politely, almost.']);
+function takeKnife(g) {
+  g.give('Kitchen knife');
+  g.say(['You pick up the knife. It’s heavy, and very, very sharp. The count is right.', 'Whatever is behind those doors gave it back. Politely, almost. Like it wants you to have it.']);
 }
 
 function clickPanel(g) {
-  if (!g.has('Kelly clamp')) {
-    g.say(['The main breaker for OR 1. The handle has been snapped off. Only a little metal stub is left, too small to grip with your fingers.', g.flag('orCounted') ? 'You need something that can clamp onto it.' : 'You can’t do anything about it now anyway. The count comes first.']);
+  if (!g.has('Kitchen knife')) {
+    g.say(['The main breaker for OR 1. The handle has been snapped off. Only a little metal stub is left, too small to grip with your fingers.', g.flag('orCounted') ? 'Not until the count is right. Find that knife.' : 'You can’t do anything about it now anyway. The count comes first.']);
     return;
   }
-  g.say(['You lock the Kelly clamp onto the broken stub. Ratchet, ratchet, click. It holds.', 'Then you pull.'], () => {
+  g.say(['You grab a Kelly clamp off the back table and lock it onto the broken stub. Ratchet, ratchet, click. It holds.', 'Then you pull.'], () => {
     g.audio.breaker();
     g.audio.stopEvents();
     g.audio.ambientLevel(0, 1.2);
@@ -637,7 +948,7 @@ function handshake(g) {
         'The monster scratching at the doors all night. It was them the whole time.',
         'Dio is sitting on top of the breaker panel in a party hat. He hates it. He’s not taking it off.',
         'The board on the wall has changed. PROCEDURE: BIRTHDAY.',
-        'Whoever’s hand that was, they’re gone. But there’s a card on the cake with your name on it.',
+        'Whoever’s hand that was, they’re gone. But there’s a cake with your name on it, and you are holding a very big knife.',
       ]);
     },
   });
@@ -647,8 +958,7 @@ function handshake(g) {
 function partySpots(g) {
   const cx = TABLE.x + TABLE.w / 2;
   return [
-    { x: cx + 80, y: TABLE.y - 60, w: 90, h: 70, label: 'Card', click: () => openCard(g) },
-    { x: cx - 100, y: TABLE.y - 150, w: 180, h: 170, label: 'Cake', click: () => clickCake(g) },
+    { x: cx - 100, y: TABLE.y - 150, w: 200, h: 170, label: g.flag('cakeCut') ? 'Card' : 'Cake', click: () => clickCake(g) },
     { x: 440, y: 580, w: 170, h: 230, label: 'Kagura', click: () => clickDog(g, 'Kagura', 'Squeaky bone') },
     { x: 740, y: 580, w: 170, h: 230, label: 'Kana', click: () => clickDog(g, 'Kana', 'Tennis ball') },
     { x: 315, y: 180, w: 110, h: 130, label: 'Dio', click: () => { g.audio.hiss(); g.say(['Dio stares down at you from on top of the breaker panel.', 'He blinks slowly, once. From Dio, that is basically a hug. Happy birthday.']); } },
@@ -658,15 +968,26 @@ function partySpots(g) {
 }
 
 function clickCake(g) {
+  if (g.flag('cakeCut')) { openCard(g); return; }
+  if (!g.has('Kitchen knife')) {
+    g.say(['A two-tier cake, pink on pink, with DEBBIE piped across it.', 'You’ll need something to cut it with.']);
+    return;
+  }
   g.audio.candle();
-  g.say(['A two-tier cake, pink on pink, with DEBBIE piped across it. Two candles: a 2 and a 9.', 'You make a wish. You don’t say it out loud. You don’t have to.'], () => {
-    if (!g.hasPage(5)) openCard(g);
+  g.say([
+    'A two-tier cake, pink on pink, with DEBBIE piped across it. Two candles: a 2 and a 9.',
+    'You make a wish. You don’t say it out loud. You don’t have to.',
+    'Then you do what the knife was for all along. You cut the first slice.',
+    'The knife hits something that isn’t cake. Folded up inside, there’s a card with your name on it.',
+  ], () => {
+    g.set('cakeCut');
+    openCard(g);
   });
 }
 
 function openCard(g) {
   if (!g.hasPage(5)) {
-    g.say(['You open the card. Folded inside is the last torn page.'], () => g.findPage(5, () => finalScreen(g)));
+    g.say(['You pull out the card and wipe the frosting off. Folded inside is the last torn page.'], () => g.findPage(5, () => finalScreen(g)));
     return;
   }
   finalScreen(g);

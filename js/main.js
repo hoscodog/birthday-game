@@ -206,7 +206,7 @@ function drawCursor() {
   ctx.beginPath();
   ctx.arc(mouse.x, mouse.y, 2, 0, Math.PI * 2);
   ctx.fill();
-  if (active) {
+  if (active && hover.label) {
     ctx.font = '22px "Special Elite", "Courier New", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
