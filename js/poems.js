@@ -41,7 +41,7 @@ export const POEM_PAGES = [
   {
     title: 'V. Tia',
     stanzas: [
-      ['There’s a little boy who’s coming,', 'Who doesn’t know your name just yet.', 'But soon he’ll learn the sound of “Tia,”', 'And all the love that he will get.'],
+      ['There’s a little boy coming in April,', 'Who doesn’t know your name just yet.', 'But soon he’ll learn the sound of “Tia,”', 'And all the love that he will get.'],
       ['He’ll get the hugs, the silly faces,', 'The beanie you’ll crochet for him,', 'A tia who will spoil him rotten', 'And light the room when lights are dim.'],
       ['And watching you, I see tomorrow,', 'The kind of family love can be.', 'If he gets even half your kindness,', 'He’ll be as lucky, love, as me.'],
     ],
@@ -50,7 +50,7 @@ export const POEM_PAGES = [
     title: 'VI. Happy Birthday, My Love',
     stanzas: [
       ['So here’s to you, and all you’re becoming,', 'To every dream you’re reaching for.', 'To all the laughter still awaiting,', 'And all the love we have in store.'],
-      ['I hope this year brings you the happiness', 'That you so freely give away.', 'I hope you feel how much you’re cherished,', 'Not just today, but every day.'],
+      ['I hope your twenty-ninth brings happiness', 'That you so freely give away.', 'I hope you feel how much you’re cherished,', 'Not just today, but every day.'],
     ],
   },
 ];
