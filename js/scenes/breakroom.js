@@ -348,7 +348,7 @@ export default {
     // labels
     text(c, 'DO NOT SPLASH', KETTLE.x + 56, 445, { size: 10, color: '#7a1010' });
     text(c, 'KAGURA', BOWLS.x + 40, BOWLS.y + 56, { size: 13, color: '#c9bfa8' });
-    text(c, 'NANI MAMI', BOWLS.x + 140, BOWLS.y + 56, { size: 13, color: '#c9bfa8' });
+    text(c, 'KANA', BOWLS.x + 140, BOWLS.y + 56, { size: 13, color: '#c9bfa8' });
     text(c, 'Fear not.', FRIDGE.x + 60, FRIDGE.y + 192, { size: 20, color: '#3b2a1a', font: HAND });
     text(c, 'Isaiah 41:10', FRIDGE.x + 60, FRIDGE.y + 214, { size: 16, color: '#3b2a1a', font: HAND });
     text(c, 'SURGICAL WING', DOOR.x + DOOR.w / 2, DOOR.y - 56, { size: 15, color: '#222' });
@@ -436,7 +436,7 @@ export default {
         click: () => {
           g.audio.bark();
           g.say([
-            'Two little dog bowls. One says KAGURA. The other says NANI MAMI.',
+            'Two little dog bowls. One says KAGURA. The other says KANA.',
             'Somewhere far down the hall, you hear barking.',
             'They’re not supposed to be here. But you know those barks anywhere.',
           ]);
