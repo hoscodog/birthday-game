@@ -23,8 +23,9 @@ export const POEM_PAGES = [
   {
     title: 'III. The Little Things',
     stanzas: [
-      ['It’s in the way we laugh together,', 'In all the things that make us smile.', 'In every little joke between us,', 'And every moment worth the while.'],
+      ['It’s in the way we laugh together,', 'In all the things that make us smile.', 'Like Dio, who respects no one but you,', '’Cause you spank that cat once in a while.'],
       ['It’s in the way you find the humor', 'When life refuses to go right.', 'You turn the ordinary into something', 'That makes me grateful every night.'],
+      ['It’s in the moth across your chest,', 'The lady weeping on your shoulder,', 'Labubu, and the hands below,', 'I’ll know them all when we are older.'],
       ['And even when we’re doing nothing,', 'Just spending time and being near,', 'I find myself appreciating', 'The simple fact that you are here.'],
     ],
   },
