@@ -216,3 +216,131 @@ export function angryCat(c, x, y, s) {
   });
   c.restore();
 }
+
+// A small sitting dog, facing you. Colors are options so Kagura and Kana can look different.
+export function dog(c, x, y, s, t, { coat = '#c79a5b', ear = '#7a5530', belly = '#ecd9b8', hat = null, wag = 1 } = {}) {
+  c.save();
+  c.translate(x, y);
+  c.scale(s, s);
+  // tail
+  const tw = Math.sin(t / (110 / wag)) * 0.6;
+  c.strokeStyle = coat;
+  c.lineWidth = 12;
+  c.lineCap = 'round';
+  c.beginPath();
+  c.moveTo(38, 40);
+  c.quadraticCurveTo(70 + tw * 20, 10, 62 + tw * 30, -20);
+  c.stroke();
+  // body
+  c.fillStyle = coat;
+  c.beginPath(); c.ellipse(0, 40, 46, 52, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = belly;
+  c.beginPath(); c.ellipse(0, 50, 24, 36, 0, 0, Math.PI * 2); c.fill();
+  // front paws
+  c.fillStyle = coat;
+  rr(c, -30, 76, 22, 26, 10); c.fill();
+  rr(c, 8, 76, 22, 26, 10); c.fill();
+  // head
+  c.beginPath(); c.arc(0, -22, 38, 0, Math.PI * 2); c.fill();
+  // ears
+  c.fillStyle = ear;
+  c.beginPath(); c.ellipse(-36, -24, 13, 26, 0.35, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.ellipse(36, -24, 13, 26, -0.35, 0, Math.PI * 2); c.fill();
+  // snout
+  c.fillStyle = belly;
+  c.beginPath(); c.ellipse(0, -8, 20, 15, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#1a1210';
+  c.beginPath(); c.ellipse(0, -16, 7, 5, 0, 0, Math.PI * 2); c.fill();
+  // eyes
+  c.beginPath(); c.arc(-14, -32, 5, 0, Math.PI * 2); c.arc(14, -32, 5, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#fff';
+  c.beginPath(); c.arc(-12, -34, 1.6, 0, Math.PI * 2); c.arc(16, -34, 1.6, 0, Math.PI * 2); c.fill();
+  // tongue
+  c.fillStyle = '#e0707f';
+  rr(c, -6, -4, 12, 16 + Math.abs(Math.sin(t / 180)) * 3, 6); c.fill();
+  if (hat) partyHat(c, 4, -58, 1, hat[0], hat[1]);
+  c.restore();
+}
+
+export function partyHat(c, x, y, s, a = '#e04a8a', b = '#f3d36b') {
+  c.save();
+  c.translate(x, y);
+  c.scale(s, s);
+  c.rotate(0.15);
+  c.beginPath(); c.moveTo(-20, 0); c.lineTo(0, -52); c.lineTo(20, 0); c.closePath();
+  c.fillStyle = a;
+  c.fill();
+  c.save();
+  c.clip();
+  c.strokeStyle = b;
+  c.lineWidth = 6;
+  for (let k = -60; k < 40; k += 16) { c.beginPath(); c.moveTo(-30, k + 30); c.lineTo(30, k); c.stroke(); }
+  c.restore();
+  c.fillStyle = b;
+  c.beginPath(); c.arc(0, -54, 7, 0, Math.PI * 2); c.fill();
+  c.restore();
+}
+
+// A church candle. h is the wax height. Returns nothing; flame flickers with t.
+export function candle(c, x, y, h, lit, t, seed = 0) {
+  c.fillStyle = '#e9e1cc';
+  c.fillRect(x - 9, y - h, 18, h);
+  c.fillStyle = 'rgba(0,0,0,0.18)';
+  c.fillRect(x + 3, y - h, 6, h);
+  c.strokeStyle = '#222';
+  c.lineWidth = 2;
+  c.beginPath(); c.moveTo(x, y - h); c.lineTo(x, y - h - 8); c.stroke();
+  if (!lit) return;
+  const f = 1 + Math.sin(t / 70 + seed * 3) * 0.08 + Math.sin(t / 23 + seed) * 0.05;
+  const fx = x + Math.sin(t / 130 + seed) * 1.5;
+  const glow = c.createRadialGradient(fx, y - h - 14, 0, fx, y - h - 14, 50);
+  glow.addColorStop(0, 'rgba(255,200,110,0.35)');
+  glow.addColorStop(1, 'rgba(255,200,110,0)');
+  c.fillStyle = glow;
+  c.fillRect(fx - 50, y - h - 64, 100, 100);
+  c.fillStyle = '#ffcf6a';
+  c.beginPath(); c.ellipse(fx, y - h - 14, 6 * f, 13 * f, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#fff4d6';
+  c.beginPath(); c.ellipse(fx, y - h - 11, 2.5, 6, 0, 0, Math.PI * 2); c.fill();
+}
+
+// A pale hand reaching out of the dark, index finger out. reach 0..1 slides it in from below.
+export function paleHand(c, x, y, s, t, reach = 1) {
+  c.save();
+  c.translate(x + Math.sin(t / 400) * 3, y + (1 - reach) * 420 + Math.sin(t / 300) * 2);
+  c.scale(s, s);
+  c.rotate(-0.25);
+  const skin = '#d8d3c9';
+  const shade = '#a8a196';
+  // forearm, fading into the dark
+  const arm = c.createLinearGradient(0, 60, 0, 520);
+  arm.addColorStop(0, skin);
+  arm.addColorStop(1, 'rgba(216,211,201,0)');
+  c.fillStyle = arm;
+  c.beginPath();
+  c.moveTo(-34, 50); c.lineTo(-48, 520); c.lineTo(52, 520); c.lineTo(36, 50); c.closePath();
+  c.fill();
+  // palm
+  c.fillStyle = skin;
+  rr(c, -42, -40, 84, 100, 30);
+  c.fill();
+  // curled fingers
+  c.fillStyle = shade;
+  [[-2, -30], [18, -26], [34, -16]].forEach(([fx, fy]) => { rr(c, fx - 4, fy - 14, 22, 30, 10); c.fill(); });
+  // index finger, out
+  c.fillStyle = skin;
+  rr(c, -36, -128, 24, 104, 12);
+  c.fill();
+  c.strokeStyle = shade;
+  c.lineWidth = 2;
+  [-96, -66].forEach((ky) => { c.beginPath(); c.moveTo(-32, ky); c.lineTo(-16, ky); c.stroke(); });
+  // thumb
+  c.fillStyle = skin;
+  c.save();
+  c.translate(-40, 10);
+  c.rotate(-0.9);
+  rr(c, -12, -46, 24, 56, 12);
+  c.fill();
+  c.restore();
+  c.restore();
+}

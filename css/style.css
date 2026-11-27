@@ -185,3 +185,20 @@ button.ghost:hover { color: var(--ink); }
   min-height: 11em; white-space: pre-line;
 }
 #intro-buttons { display: flex; gap: 14px; }
+
+/* surgical count */
+.count-list button { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; }
+.count-list b { color: #d9c27a; }
+
+/* final screen */
+.paper.final { transform: rotate(0.5deg); }
+.paper .closing { font-size: 1.6rem; line-height: 36px; color: #5a1010; text-align: center; margin-top: 10px; }
+.photo-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.photo-row img { width: 120px; height: 120px; object-fit: cover; border: 6px solid #f4f1ea; transform: rotate(-2deg); }
+.photo-row img:nth-child(even) { transform: rotate(2deg); }
+.final-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+a.btn {
+  font-family: var(--type); font-size: 1rem; color: #1a1208; background: #d9c27a; border: 1px solid #f3dca0;
+  padding: 0.55rem 1.2rem; text-decoration: none; letter-spacing: 0.06em;
+}
+a.btn:hover { background: #f3dca0; }

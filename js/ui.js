@@ -165,7 +165,8 @@ export function sequence({ title, sub = '', steps, onSuccess, onFail, onCancel }
       } else {
         fails++;
         shakeCard();
-        onFail && onFail(fails);
+        // onFail can return true to close the puzzle instead of letting the player retry right away.
+        if (onFail && onFail(fails) === true) { close(); return; }
         reset();
       }
     };
