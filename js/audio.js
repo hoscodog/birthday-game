@@ -4,6 +4,7 @@ let ac = null;
 let master = null;
 let noiseBuf = null;
 let ambientTimer = null;
+let ambBus = null;
 
 export function init() {
   if (ac) {
@@ -64,6 +65,9 @@ function tone({ freq = 440, type = 'sine', dur = 0.2, gain = 0.2, attack = 0.005
 
 export function startAmbient() {
   if (!ok() || ambientTimer) return;
+  ambBus = ac.createGain();
+  ambBus.gain.value = 1;
+  ambBus.connect(master);
   // Low drone with a slowly wandering filter.
   const g = ac.createGain();
   g.gain.value = 0.05;
@@ -82,17 +86,17 @@ export function startAmbient() {
     o.connect(f);
     o.start();
   });
-  f.connect(g).connect(master);
+  f.connect(g).connect(ambBus);
   lfo.start();
   // Fluorescent-light hum.
   const hum = ac.createOscillator();
   const hg = ac.createGain();
   hum.frequency.value = 120;
   hg.gain.value = 0.006;
-  hum.connect(hg).connect(master);
+  hum.connect(hg).connect(ambBus);
   hum.start();
 
-  const events = [footsteps, whisper, distantBark, distantPager, drip];
+  const events = [footsteps, whisper, distantBark, distantPager, drip, gurney];
   const schedule = () => {
     ambientTimer = setTimeout(() => {
       events[Math.floor(Math.random() * events.length)]();
@@ -186,4 +190,89 @@ export function drip() { tone({ freq: 1400, to: 600, dur: 0.15, gain: 0.05 }); }
 export function door() {
   noise({ dur: 0.8, type: 'bandpass', freq: 300, q: 1, gain: 0.25, attack: 0.1, release: 0.4 });
   tone({ freq: 90, to: 60, dur: 0.6, gain: 0.12, when: 0.5 });
+}
+
+// Fade the drone and hum (0 = silent, 1 = normal). Used by the chapel and the finale.
+export function ambientLevel(level, secs = 2) {
+  if (!ok() || !ambBus) return;
+  const t = ac.currentTime;
+  ambBus.gain.cancelScheduledValues(t);
+  ambBus.gain.setValueAtTime(ambBus.gain.value, t);
+  ambBus.gain.linearRampToValueAtTime(level, t + secs);
+}
+
+// Stop the random creepy events (footsteps, whispers...) for good.
+export function stopEvents() {
+  clearTimeout(ambientTimer);
+  ambientTimer = 1; // non-null so startAmbient won't restart them
+}
+
+export function gurney() {
+  // Wheels rattling past in the hall, getting louder then fading away.
+  for (let i = 0; i < 26; i++) {
+    const k = i / 25;
+    const vol = Math.sin(k * Math.PI) * 0.09;
+    noise({ dur: 0.05, type: 'bandpass', freq: 1500 + Math.random() * 900, q: 6, gain: vol, when: i * 0.13 });
+    if (i % 6 === 0) tone({ freq: 1900, to: 1700, dur: 0.18, gain: vol * 0.25, when: i * 0.13 });
+  }
+}
+
+export function candle() { noise({ dur: 0.35, type: 'lowpass', freq: 900, gain: 0.12, attack: 0.02, release: 0.25 }); }
+
+export function musicBox() {
+  // A slightly out-of-tune little lullaby (original melody).
+  const notes = [784, 659, 587, 659, 523, 587, 494, 0, 523, 587, 659, 523, 587, 494, 440];
+  notes.forEach((f, i) => {
+    if (!f) return;
+    tone({ freq: f * 0.985, type: 'sine', dur: 0.9, gain: 0.07, when: i * 0.42 });
+    tone({ freq: f * 2 * 0.99, type: 'sine', dur: 0.4, gain: 0.015, when: i * 0.42 });
+  });
+}
+
+export function monitor() {
+  noise({ dur: 1.8, type: 'bandpass', freq: 1800, q: 0.8, gain: 0.08, attack: 0.05, release: 0.4 });
+  // soft breathing under the hiss
+  [0.3, 1.2].forEach((w) => noise({ dur: 0.6, type: 'bandpass', freq: 500, q: 1.5, gain: 0.07, attack: 0.25, release: 0.3, when: w }));
+}
+
+export function squeak() {
+  tone({ freq: 1300, to: 1900, type: 'triangle', dur: 0.12, gain: 0.1 });
+  tone({ freq: 1900, to: 1200, type: 'triangle', dur: 0.15, gain: 0.08, when: 0.14 });
+}
+
+export function pant() {
+  for (let i = 0; i < 6; i++) noise({ dur: 0.12, type: 'bandpass', freq: 900, q: 1.2, gain: 0.07, when: i * 0.2 });
+}
+
+export function heartbeat() {
+  [0, 0.25, 1.0, 1.25].forEach((w, i) => tone({ freq: 55, to: 38, dur: 0.18, gain: i % 2 ? 0.18 : 0.26, when: w }));
+}
+
+export function breaker() {
+  noise({ dur: 0.15, type: 'lowpass', freq: 1200, gain: 0.5, attack: 0.002, release: 0.1 });
+  tone({ freq: 110, to: 30, type: 'sawtooth', dur: 1.6, gain: 0.12, when: 0.05 });
+}
+
+export function lightsOn() {
+  noise({ dur: 0.1, type: 'lowpass', freq: 2000, gain: 0.4, attack: 0.002, release: 0.08 });
+  [0.15, 0.32, 0.45].forEach((w) => noise({ dur: 0.05, type: 'highpass', freq: 4000, gain: 0.12, when: w }));
+  tone({ freq: 120, dur: 1.2, gain: 0.03, when: 0.5 });
+}
+
+export function happyBirthday() {
+  // Public-domain melody, music-box style.
+  const G = 392, A = 440, B = 494, C = 523, D = 587, E = 659, F = 698, Gh = 784;
+  const song = [
+    [G, 0.75], [G, 0.25], [A, 1], [G, 1], [C, 1], [B, 2],
+    [G, 0.75], [G, 0.25], [A, 1], [G, 1], [D, 1], [C, 2],
+    [G, 0.75], [G, 0.25], [Gh, 1], [E, 1], [C, 1], [B, 1], [A, 2],
+    [F, 0.75], [F, 0.25], [E, 1], [C, 1], [D, 1], [C, 2.5],
+  ];
+  const beat = 0.42;
+  let w = 0.2;
+  song.forEach(([f, d]) => {
+    tone({ freq: f, type: 'triangle', dur: d * beat + 0.3, gain: 0.09, when: w });
+    tone({ freq: f * 2, type: 'sine', dur: 0.3, gain: 0.02, when: w });
+    w += d * beat;
+  });
 }

@@ -5,9 +5,12 @@ import { POEM_PAGES } from './poems.js';
 import { VW, VH, inRect, angryCat } from './draw.js';
 import scrub from './scenes/scrub.js';
 import breakroom from './scenes/breakroom.js';
-import wing from './scenes/wing.js';
+import recovery from './scenes/recovery.js';
+import chapel from './scenes/chapel.js';
+import nursery from './scenes/nursery.js';
+import orRoom from './scenes/or.js';
 
-const scenes = { scrub, break: breakroom, wing };
+const scenes = { scrub, break: breakroom, recovery, chapel, nursery, or: orRoom };
 const SAVE_KEY = 'nightshift-save-v1';
 const $ = (id) => document.getElementById(id);
 
@@ -16,6 +19,7 @@ const fresh = () => ({ room: 'scrub', items: [], flags: {}, pages: [], battery: 
 function loadSave() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (s && s.room === 'wing') s.room = 'recovery'; // old placeholder room from the preview build
     return s && scenes[s.room] ? s : null;
   } catch (e) {
     return null;
@@ -174,13 +178,18 @@ function cutLight(x, y, r, a) {
   mctx.fillRect(x - r, y - r, r * 2, r * 2);
 }
 
+// Rooms can override: darkness(game) -> 0..1 how dark the room is, flashlight(game) -> false while it's dead.
+const flashlightOn = (scene) => mouse.inside && (!scene.flashlight || scene.flashlight(game));
+
 function drawMask(scene, t) {
+  const dark = scene.darkness ? scene.darkness(game) : 0.97;
   mctx.setTransform(0.5, 0, 0, 0.5, 0, 0);
-  mctx.globalCompositeOperation = 'source-over';
-  mctx.fillStyle = 'rgba(2,2,4,0.97)';
+  mctx.globalCompositeOperation = 'copy';
+  mctx.fillStyle = `rgba(2,2,4,${dark})`;
   mctx.fillRect(0, 0, VW, VH);
+  if (dark <= 0) return;
   mctx.globalCompositeOperation = 'destination-out';
-  if (mouse.inside) cutLight(mouse.x, mouse.y, flashlightRadius(t), 1);
+  if (flashlightOn(scene)) cutLight(mouse.x, mouse.y, flashlightRadius(t), 1);
   (scene.lights ? scene.lights(t, game) : []).forEach((l) => cutLight(l.x, l.y, l.r, l.a));
   mctx.globalCompositeOperation = 'source-over';
 }
@@ -242,7 +251,9 @@ function frame(t) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (running) {
     const dt = Math.min(0.1, (t - last) / 1000);
-    if (!ui.busy() && !scare) {
+    const scene = scenes[state.room];
+    const safe = typeof scene.safe === 'function' ? scene.safe(game) : scene.safe;
+    if (!ui.busy() && !scare && !safe) {
       state.battery = Math.max(20, state.battery - dt * 0.3);
       state.minutes += dt / 12;
     }
@@ -253,7 +264,6 @@ function frame(t) {
       updateClock();
       persist();
     }
-    const scene = scenes[state.room];
     if (scene.update) scene.update(t, game);
     hover = ui.busy() ? null : findHover();
 
@@ -271,7 +281,7 @@ function frame(t) {
     scene.draw(ctx, t, game);
     drawMask(scene, t);
     ctx.drawImage(mask, 0, 0, VW, VH);
-    if (mouse.inside) {
+    if (flashlightOn(scene)) {
       const warm = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 220);
       warm.addColorStop(0, 'rgba(255,220,160,0.07)');
       warm.addColorStop(1, 'rgba(255,220,160,0)');

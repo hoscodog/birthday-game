@@ -552,5 +552,5 @@ function clickDoor(g) {
   g.set('wingOpen');
   g.audio.unlock();
   g.audio.door();
-  g.goTo('wing', 'The reader blinks green.\n\nThe surgical wing is colder than the rest of the hospital, and much, much quieter.\n\nYou hear footsteps up ahead. They stop when you stop.');
+  g.goTo('recovery', 'The reader blinks green.\n\nThe surgical wing is colder than the rest of the hospital, and much, much quieter.\n\nYou hear footsteps up ahead. They stop when you stop.');
 }
