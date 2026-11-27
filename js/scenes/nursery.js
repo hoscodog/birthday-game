@@ -224,12 +224,18 @@ export default {
       c.fill();
       text(c, 'TIA ♥', CRIB.x + 195, CRIB.y + 143, { size: 12, color: '#2a3a5a' });
     }
-    // crocheted octopus
-    c.fillStyle = '#e6a3c9';
-    c.beginPath(); c.arc(CRIB.x + 290, CRIB.y + 132, 18, Math.PI, 0); c.fill();
-    for (let k = 0; k < 5; k++) { c.fillRect(CRIB.x + 274 + k * 7, CRIB.y + 132, 4, 14 + Math.sin(k + t / 500) * 3); }
-    c.fillStyle = '#1a1020';
-    c.beginPath(); c.arc(CRIB.x + 284, CRIB.y + 126, 2, 0, Math.PI * 2); c.arc(CRIB.x + 296, CRIB.y + 126, 2, 0, Math.PI * 2); c.fill();
+    // crocheted beanie
+    const bx = CRIB.x + 290, by = CRIB.y + 144;
+    c.fillStyle = '#e8c77a';
+    c.beginPath(); c.arc(bx, by, 20, Math.PI, 0); c.fill();
+    c.strokeStyle = 'rgba(110,70,20,0.45)'; c.lineWidth = 1.2;
+    for (const r of [8, 14]) { c.beginPath(); c.arc(bx, by, r, Math.PI * 1.08, Math.PI * 1.92); c.stroke(); }
+    c.fillStyle = '#d2a955';
+    rr(c, bx - 22, by - 3, 44, 10, 3); c.fill();
+    c.fillStyle = 'rgba(110,70,20,0.35)';
+    for (let k = 0; k < 9; k++) c.fillRect(bx - 19 + k * 4.6, by - 2, 1.2, 8);
+    c.fillStyle = '#f3e3b8';
+    c.beginPath(); c.arc(bx, by - 22 + Math.sin(t / 600), 6, 0, Math.PI * 2); c.fill();
     // bassinet cards
     text(c, 'BABY BOY', BASSINETS[0].x + 75, BASSINETS[0].y - 15, { size: 11, color: '#2a3a5a' });
     text(c, '— — —', BASSINETS[1].x + 75, BASSINETS[1].y - 15, { size: 11, color: '#555' });
@@ -260,7 +266,7 @@ export default {
       { ...CHAIR, label: 'Rocking chair', click: () => clickChair(g) },
       { ...MOBILE, label: 'Mobile', click: () => { g.audio.musicBox(); g.say(['The mobile turns, slow and steady. A moon, a star, a cloud.', 'And a tiny crocheted jellyfish. That one looks a lot like your stitches.']); } },
       { ...MONITOR, label: 'Baby monitor', click: () => { g.audio.monitor(); g.say(['The baby monitor crackles. Under the static: breathing. Slow, peaceful breathing.', 'A baby, sound asleep, somewhere very far away. Or not born yet.']); } },
-      { ...BASSINETS[0], label: 'Bassinet', click: () => g.say(['The card on this bassinet says BABY BOY. Under it, someone has added in tiny handwriting: “coming soon.”']) },
+      { ...BASSINETS[0], label: 'Bassinet', click: () => g.say(['The card on this bassinet says BABY BOY. Under it, someone has added in tiny handwriting: “due in April.”']) },
       { ...BASSINETS[1], label: 'Bassinet', click: () => g.say(['An empty bassinet. The blanket is folded into a perfect square. Night shift has standards.']) },
       { ...CRIB, label: 'Crib', click: () => clickCrib(g) },
       { ...DOOR, label: 'OR 1', click: () => clickDoor(g) },
@@ -288,7 +294,7 @@ function clickCrib(g) {
     g.set('onesie');
     g.say([
       'In the crib, folded small, is a tiny blue onesie. Across the front, in white letters: MY TIA LOVES ME.',
-      'There’s a little crocheted octopus beside it. You know those stitches. Those are yours.',
+      'Beside it is a tiny crocheted beanie, barely bigger than your hand. You know those stitches. Those are yours.',
       'This is for Alex’s baby boy. Your nephew. The one who doesn’t know your name yet.',
       'Something is tucked inside the onesie.',
     ], () => g.findPage(4, () => g.say(['You have to wipe your eyes before you can keep going.'])));
@@ -307,7 +313,7 @@ function clickCrib(g) {
     ]);
     return;
   }
-  g.say(['The crocheted octopus smiles up at you. He’ll love it. He’s going to love you.']);
+  g.say(['The little beanie sits in the crib, waiting for him. He’ll love it. He’s going to love you.']);
 }
 
 function clickDoor(g) {
