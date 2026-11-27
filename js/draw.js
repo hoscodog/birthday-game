@@ -160,18 +160,22 @@ export function jellyfish(c, x, y, s, t) {
   c.restore();
 }
 
-// Dio, mid-pounce: black cat, ears back, glowing eyes, mouth open.
+// Dio, mid-pounce: grey and white cat, ears back, glowing eyes, mouth open.
 export function angryCat(c, x, y, s) {
   c.save();
   c.translate(x, y);
   c.scale(s, s);
-  c.fillStyle = '#060606';
+  c.fillStyle = '#7d838a';
   // body + legs
   c.beginPath(); c.ellipse(0, 70, 120, 70, 0, 0, Math.PI * 2); c.fill();
-  c.lineWidth = 26; c.lineCap = 'round'; c.strokeStyle = '#060606';
+  c.lineWidth = 26; c.lineCap = 'round'; c.strokeStyle = '#7d838a';
   [[-90, 90, -150, 170], [90, 90, 150, 170], [-50, 110, -70, 190], [50, 110, 70, 190]].forEach(([a, b, cx, d]) => {
     c.beginPath(); c.moveTo(a, b); c.lineTo(cx, d); c.stroke();
   });
+  // white chest and white paws
+  c.fillStyle = '#eeeeea';
+  c.beginPath(); c.ellipse(0, 80, 60, 52, 0, 0, Math.PI * 2); c.fill();
+  [[-150, 170], [150, 170], [-70, 190], [70, 190]].forEach(([px, py]) => { c.beginPath(); c.arc(px, py, 15, 0, Math.PI * 2); c.fill(); });
   // claws
   c.strokeStyle = '#e8e2d6'; c.lineWidth = 3;
   [[-150, 170], [150, 170]].forEach(([px, py]) => {
@@ -180,14 +184,22 @@ export function angryCat(c, x, y, s) {
     }
   });
   // tail, puffed
-  c.strokeStyle = '#060606'; c.lineWidth = 30;
+  c.strokeStyle = '#7d838a'; c.lineWidth = 30;
   c.beginPath(); c.moveTo(100, 40); c.quadraticCurveTo(200, -40, 160, -120); c.stroke();
   // head
-  c.fillStyle = '#060606';
+  c.fillStyle = '#7d838a';
   c.beginPath(); c.arc(0, -40, 85, 0, Math.PI * 2); c.fill();
   // ears pinned back
   c.beginPath(); c.moveTo(-80, -60); c.lineTo(-140, -110); c.lineTo(-40, -110); c.closePath(); c.fill();
   c.beginPath(); c.moveTo(80, -60); c.lineTo(140, -110); c.lineTo(40, -110); c.closePath(); c.fill();
+  // darker tabby stripes on the forehead, white muzzle and inner ears
+  c.strokeStyle = '#5a6066'; c.lineWidth = 7; c.lineCap = 'round';
+  [-22, 0, 22].forEach((sx) => { c.beginPath(); c.moveTo(sx, -120); c.lineTo(sx * 0.8, -92); c.stroke(); });
+  c.fillStyle = '#eeeeea';
+  c.beginPath(); c.ellipse(0, -2, 58, 46, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#d99aa0';
+  c.beginPath(); c.moveTo(-82, -70); c.lineTo(-122, -104); c.lineTo(-56, -104); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(82, -70); c.lineTo(122, -104); c.lineTo(56, -104); c.closePath(); c.fill();
   // eyes
   const eye = (ex) => {
     const g = c.createRadialGradient(ex, -55, 2, ex, -55, 30);
@@ -208,7 +220,7 @@ export function angryCat(c, x, y, s) {
     c.beginPath(); c.moveTo(a, b); c.lineTo(cx, d); c.lineTo(e, f); c.closePath(); c.fill();
   });
   // whiskers
-  c.strokeStyle = 'rgba(230,230,230,0.7)'; c.lineWidth = 2;
+  c.strokeStyle = 'rgba(60,60,60,0.7)'; c.lineWidth = 2;
   [-1, 1].forEach((side) => {
     for (let k = -1; k <= 1; k++) {
       c.beginPath(); c.moveTo(side * 40, -14 + k * 8); c.lineTo(side * 130, -24 + k * 18); c.stroke();
@@ -217,48 +229,67 @@ export function angryCat(c, x, y, s) {
   c.restore();
 }
 
-// A small sitting dog, facing you. Colors are options so Kagura and Kana can look different.
-export function dog(c, x, y, s, t, { coat = '#c79a5b', ear = '#7a5530', belly = '#ecd9b8', hat = null, wag = 1 } = {}) {
+// A chihuahua sitting and facing you: apple head, huge upright ears, big eyes, skinny legs.
+// Colors are options so Kagura (tan) and Kana (white) look like themselves.
+export function dog(c, x, y, s, t, { coat = '#d9a865', shade = '#b9843f', belly = '#f0d9b0', hat = null, wag = 1 } = {}) {
   c.save();
   c.translate(x, y);
   c.scale(s, s);
-  // tail
+  // thin tail, curled up and wagging
   const tw = Math.sin(t / (110 / wag)) * 0.6;
   c.strokeStyle = coat;
-  c.lineWidth = 12;
+  c.lineWidth = 6;
   c.lineCap = 'round';
   c.beginPath();
-  c.moveTo(38, 40);
-  c.quadraticCurveTo(70 + tw * 20, 10, 62 + tw * 30, -20);
+  c.moveTo(24, 58);
+  c.quadraticCurveTo(52 + tw * 16, 40, 46 + tw * 24, 12);
   c.stroke();
-  // body
+  // little body
+  c.fillStyle = shade;
+  c.beginPath(); c.ellipse(0, 52, 32, 44, 0, 0, Math.PI * 2); c.fill();
   c.fillStyle = coat;
-  c.beginPath(); c.ellipse(0, 40, 46, 52, 0, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.ellipse(-2, 50, 29, 42, 0, 0, Math.PI * 2); c.fill();
   c.fillStyle = belly;
-  c.beginPath(); c.ellipse(0, 50, 24, 36, 0, 0, Math.PI * 2); c.fill();
-  // front paws
+  c.beginPath(); c.ellipse(0, 58, 15, 30, 0, 0, Math.PI * 2); c.fill();
+  // skinny front legs + tiny paws
   c.fillStyle = coat;
-  rr(c, -30, 76, 22, 26, 10); c.fill();
-  rr(c, 8, 76, 22, 26, 10); c.fill();
-  // head
-  c.beginPath(); c.arc(0, -22, 38, 0, Math.PI * 2); c.fill();
-  // ears
-  c.fillStyle = ear;
-  c.beginPath(); c.ellipse(-36, -24, 13, 26, 0.35, 0, Math.PI * 2); c.fill();
-  c.beginPath(); c.ellipse(36, -24, 13, 26, -0.35, 0, Math.PI * 2); c.fill();
-  // snout
+  rr(c, -17, 62, 10, 38, 5); c.fill();
+  rr(c, 7, 62, 10, 38, 5); c.fill();
   c.fillStyle = belly;
-  c.beginPath(); c.ellipse(0, -8, 20, 15, 0, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.ellipse(-12, 99, 8, 5, 0, 0, Math.PI * 2); c.ellipse(12, 99, 8, 5, 0, 0, Math.PI * 2); c.fill();
+  // big upright ears, angled out
+  const ear = (side) => {
+    c.save();
+    c.scale(side, 1);
+    c.fillStyle = shade;
+    c.beginPath(); c.moveTo(12, -44); c.lineTo(58, -92); c.lineTo(36, -24); c.closePath(); c.fill();
+    c.fillStyle = '#e8a7a7';
+    c.beginPath(); c.moveTo(19, -42); c.lineTo(52, -80); c.lineTo(34, -30); c.closePath(); c.fill();
+    c.restore();
+  };
+  ear(-1);
+  ear(1);
+  // apple-dome head
+  c.fillStyle = coat;
+  c.beginPath(); c.ellipse(0, -26, 36, 33, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = 'rgba(0,0,0,0.06)';
+  c.beginPath(); c.ellipse(0, -44, 26, 12, 0, 0, Math.PI * 2); c.fill();
+  // short snout
+  c.fillStyle = belly;
+  c.beginPath(); c.ellipse(0, -10, 15, 11, 0, 0, Math.PI * 2); c.fill();
   c.fillStyle = '#1a1210';
-  c.beginPath(); c.ellipse(0, -16, 7, 5, 0, 0, Math.PI * 2); c.fill();
-  // eyes
-  c.beginPath(); c.arc(-14, -32, 5, 0, Math.PI * 2); c.arc(14, -32, 5, 0, Math.PI * 2); c.fill();
-  c.fillStyle = '#fff';
-  c.beginPath(); c.arc(-12, -34, 1.6, 0, Math.PI * 2); c.arc(16, -34, 1.6, 0, Math.PI * 2); c.fill();
-  // tongue
+  c.beginPath(); c.ellipse(0, -15, 5, 3.6, 0, 0, Math.PI * 2); c.fill();
+  // big shiny eyes
+  [-15, 15].forEach((ex) => {
+    c.fillStyle = '#1a1210';
+    c.beginPath(); c.arc(ex, -30, 8, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(ex + 3, -33, 2.6, 0, Math.PI * 2); c.arc(ex - 2, -27, 1.2, 0, Math.PI * 2); c.fill();
+  });
+  // tiny tongue
   c.fillStyle = '#e0707f';
-  rr(c, -6, -4, 12, 16 + Math.abs(Math.sin(t / 180)) * 3, 6); c.fill();
-  if (hat) partyHat(c, 4, -58, 1, hat[0], hat[1]);
+  rr(c, -4, -5, 8, 8 + Math.abs(Math.sin(t / 180)) * 3, 4); c.fill();
+  if (hat) partyHat(c, 2, -56, 0.85, hat[0], hat[1]);
   c.restore();
 }
 

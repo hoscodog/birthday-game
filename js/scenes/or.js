@@ -218,19 +218,36 @@ function drawClamp(c, x, y) {
 }
 
 function sittingCat(c, x, y, s) {
+  // Dio: grey and white, sitting, deeply unimpressed
+  const grey = '#7d838a';
+  const white = '#eeeeea';
   c.save();
   c.translate(x, y);
   c.scale(s, s);
-  c.fillStyle = '#0a0a0a';
-  c.beginPath(); c.ellipse(0, 30, 34, 40, 0, 0, Math.PI * 2); c.fill();
-  c.beginPath(); c.arc(0, -16, 26, 0, Math.PI * 2); c.fill();
-  c.beginPath(); c.moveTo(-24, -26); c.lineTo(-18, -54); c.lineTo(-4, -38); c.closePath(); c.fill();
-  c.beginPath(); c.moveTo(24, -26); c.lineTo(18, -54); c.lineTo(4, -38); c.closePath(); c.fill();
-  c.strokeStyle = '#0a0a0a';
+  c.strokeStyle = grey;
   c.lineWidth = 9;
   c.lineCap = 'round';
   c.beginPath(); c.moveTo(28, 56); c.quadraticCurveTo(70, 50, 56, 10); c.stroke();
-  c.fillStyle = '#c8e83a';
+  c.fillStyle = grey;
+  c.beginPath(); c.ellipse(0, 30, 34, 40, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = white;
+  c.beginPath(); c.ellipse(0, 40, 20, 30, 0, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.ellipse(-12, 68, 9, 5, 0, 0, Math.PI * 2); c.ellipse(12, 68, 9, 5, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = grey;
+  c.beginPath(); c.moveTo(-24, -26); c.lineTo(-18, -54); c.lineTo(-4, -38); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(24, -26); c.lineTo(18, -54); c.lineTo(4, -38); c.closePath(); c.fill();
+  c.beginPath(); c.arc(0, -16, 26, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#d99aa0';
+  c.beginPath(); c.moveTo(-20, -30); c.lineTo(-17, -47); c.lineTo(-9, -37); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(20, -30); c.lineTo(17, -47); c.lineTo(9, -37); c.closePath(); c.fill();
+  c.strokeStyle = '#5a6066';
+  c.lineWidth = 3;
+  [-8, 0, 8].forEach((sx) => { c.beginPath(); c.moveTo(sx, -40); c.lineTo(sx * 0.8, -30); c.stroke(); });
+  c.fillStyle = white;
+  c.beginPath(); c.ellipse(0, -6, 17, 13, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#d99aa0';
+  c.beginPath(); c.moveTo(-3, -11); c.lineTo(3, -11); c.lineTo(0, -7); c.closePath(); c.fill();
+  c.fillStyle = '#9fc23a';
   c.beginPath(); c.ellipse(-10, -18, 6, 3, 0.2, 0, Math.PI * 2); c.ellipse(10, -18, 6, 3, -0.2, 0, Math.PI * 2); c.fill(); // unimpressed squint
   partyHat(c, 6, -40, 0.7, '#3b6fa8', '#f3d36b');
   c.restore();
@@ -345,8 +362,8 @@ function drawParty(c, t, g) {
   sittingCat(c, 365, 250, 0.9);
   // the dogs, very proud of themselves
   const hop = (n) => Math.max(0, Math.sin(t / 260 + n)) * 10;
-  dog(c, 520, 690 - hop(0), 1.15, t, { coat: '#d8b47a', ear: '#8a6034', belly: '#f2e4c8', hat: ['#e04a8a', '#f3d36b'], wag: 2 });
-  dog(c, 820, 690 - hop(1.6), 1.05, t, { coat: '#3a302a', ear: '#1e1814', belly: '#c9b49a', hat: ['#3fb0dc', '#ffffff'], wag: 2 });
+  dog(c, 520, 690 - hop(0), 1.15, t, { coat: '#d9a865', shade: '#b9843f', belly: '#f0d9b0', hat: ['#e04a8a', '#f3d36b'], wag: 2 });
+  dog(c, 820, 690 - hop(1.6), 1.15, t, { coat: '#f4f1ea', shade: '#d8d2c6', belly: '#ffffff', hat: ['#3fb0dc', '#f3d36b'], wag: 2 });
   text(c, 'KAGURA', 520, 822, { size: 16, color: '#efe4cc' });
   text(c, 'KANA', 820, 822, { size: 16, color: '#efe4cc' });
   // confetti
