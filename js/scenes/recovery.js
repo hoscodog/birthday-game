@@ -1,5 +1,5 @@
-// Room 3: recovery room 13, the tattoo cipher. The patient chart has a tattoo flash sheet (each design = a digit),
-// the X-ray light box shows a forearm with four tattoos on it, and those spell the door code 1997.
+// Room 3: recovery room 13, the tattoo cipher. The patient chart has a tattoo flash sheet (each design = a number),
+// the X-ray light box shows a chest and arm with four tattoos on it, and the numbers add up to the door code 29.
 // Poem page III is in the bedside drawer. Kagura's barking leads to a squeaky bone under the bed.
 import { rr, tiles, stains, drips, text, cached, rng, HAND } from '../draw.js';
 
@@ -15,9 +15,11 @@ const IV = { x: 925, y: 180, w: 70, h: 300 };
 const DOOR = { x: 1380, y: 250, w: 160, h: 410 };
 const KEYPAD = { x: 1312, y: 410, w: 44, h: 64 };
 
-export const CODE = '1997';
+export const CODE = '29'; // the four tattoos add up to the age she turns: 9 + 8 + 7 + 5
 
-/* ---------- the ten flash-sheet designs, index = digit ---------- */
+/* ---------- the ten flash-sheet designs, index = number ---------- */
+// Four of them are the patient's real tattoos (hands-face 5, Labubu 7, the weeping lady 8, the luna moth 9).
+// The X-ray shows those four, and the door code is what they add up to: 5 + 7 + 8 + 9 = 29.
 function star(c) {
   c.beginPath();
   for (let k = 0; k < 10; k++) {
@@ -27,14 +29,6 @@ function star(c) {
   }
   c.closePath();
   c.stroke();
-}
-function rose(c) {
-  c.beginPath();
-  for (let a = 0; a < Math.PI * 5; a += 0.2) c.lineTo(Math.cos(a) * a * 1.4, Math.sin(a) * a * 1.4 - 4);
-  c.stroke();
-  c.beginPath(); c.arc(0, -4, 22, 0, Math.PI * 2); c.stroke();
-  c.beginPath(); c.ellipse(-20, 20, 12, 5, -0.6, 0, Math.PI * 2); c.stroke();
-  c.beginPath(); c.ellipse(20, 20, 12, 5, 0.6, 0, Math.PI * 2); c.stroke();
 }
 function anchor(c) {
   c.beginPath(); c.arc(0, -20, 6, 0, Math.PI * 2); c.stroke();
@@ -61,25 +55,6 @@ function heart(c) {
   c.bezierCurveTo(18, -26, 30, -2, 0, 20);
   c.stroke();
 }
-function snake(c) {
-  c.beginPath();
-  for (let k = 0; k <= 30; k++) c.lineTo(-24 + k * 1.5, Math.sin(k / 3.2) * 12 + 6);
-  c.stroke();
-  c.beginPath(); c.ellipse(22, Math.sin(30 / 3.2) * 12 + 6, 7, 5, 0, 0, Math.PI * 2); c.stroke();
-  c.beginPath(); c.moveTo(29, 0); c.lineTo(34, -3); c.moveTo(29, 0); c.lineTo(34, 2); c.stroke();
-}
-function moon(c) {
-  c.beginPath();
-  c.arc(0, 0, 22, 0.35 * Math.PI, 1.65 * Math.PI);
-  c.arc(10, 0, 18, 1.55 * Math.PI, 0.45 * Math.PI, true);
-  c.closePath();
-  c.stroke();
-}
-function skull(c) {
-  c.beginPath(); c.arc(0, -4, 20, Math.PI * 0.85, Math.PI * 2.15); c.lineTo(10, 22); c.lineTo(-10, 22); c.closePath(); c.stroke();
-  c.beginPath(); c.arc(-8, -2, 5, 0, Math.PI * 2); c.moveTo(13, -2); c.arc(8, -2, 5, 0, Math.PI * 2); c.stroke();
-  c.beginPath(); c.moveTo(-4, 22); c.lineTo(-4, 16); c.moveTo(4, 22); c.lineTo(4, 16); c.stroke();
-}
 function jelly(c) {
   c.beginPath(); c.arc(0, -4, 20, Math.PI, 0); c.closePath(); c.stroke();
   for (let i = 0; i < 4; i++) {
@@ -90,8 +65,125 @@ function jelly(c) {
     c.stroke();
   }
 }
-const SYMBOLS = [star, rose, anchor, swallow, dagger, heart, snake, moon, skull, jelly];
-const NAMES = ['star', 'rose', 'anchor', 'swallow', 'dagger', 'heart', 'snake', 'crescent moon', 'skull', 'jellyfish'];
+// a face held in two hands, with a scribble where the thoughts go
+function hands(c) {
+  c.beginPath(); c.ellipse(0, 2, 13, 17, 0, 0, Math.PI * 2); c.stroke(); // face
+  // the scribble in the mind
+  c.beginPath();
+  c.moveTo(-9, -8);
+  for (let k = 0; k <= 26; k++) {
+    const a = k * 1.3;
+    c.lineTo(-8 + k * 0.62 + Math.cos(a) * 3.2, -9 + Math.sin(a) * 3.2);
+  }
+  c.stroke();
+  // closed eyes and a small mouth
+  c.beginPath();
+  c.arc(-5, 1, 3, 0.15 * Math.PI, 0.85 * Math.PI);
+  c.moveTo(8, 2); c.arc(5, 1, 3, 0.15 * Math.PI, 0.85 * Math.PI);
+  c.moveTo(-3, 12); c.quadraticCurveTo(0, 13.5, 3, 12);
+  c.stroke();
+  // two hands cupping the cheeks, fingers up along the temples
+  [-1, 1].forEach((sd) => {
+    c.beginPath();
+    c.moveTo(sd * 8, 26);
+    c.quadraticCurveTo(sd * 22, 24, sd * 22, 12);
+    for (let f = 0; f < 4; f++) {
+      const fx = sd * (21 - f * 2.4);
+      const top = -6 - f * 3;
+      c.lineTo(fx, top);
+      c.quadraticCurveTo(fx - sd * 1.2, top - 3, fx - sd * 2.4, top);
+    }
+    c.lineTo(sd * 12, 14);
+    c.stroke();
+  });
+}
+// Labubu: tall bunny ears, round head, big eyes, nine-tooth grin
+function labubu(c) {
+  [-1, 1].forEach((sd) => {
+    c.beginPath();
+    c.moveTo(sd * 4, -10);
+    c.quadraticCurveTo(sd * 3, -30, sd * 9, -30);
+    c.quadraticCurveTo(sd * 15, -28, sd * 13, -9);
+    c.stroke();
+    c.beginPath(); c.moveTo(sd * 7, -12); c.quadraticCurveTo(sd * 7, -24, sd * 9, -25); c.stroke();
+  });
+  c.beginPath(); c.ellipse(0, 6, 18, 16, 0, 0, Math.PI * 2); c.stroke();
+  c.beginPath(); c.ellipse(-7, 2, 4, 5, 0.2, 0, Math.PI * 2); c.moveTo(11, 2); c.ellipse(7, 2, 4, 5, -0.2, 0, Math.PI * 2); c.stroke();
+  // the grin
+  c.beginPath();
+  c.moveTo(-11, 10); c.quadraticCurveTo(0, 22, 11, 10); c.quadraticCurveTo(0, 14, -11, 10);
+  c.stroke();
+  c.beginPath();
+  for (let k = 0; k < 9; k++) {
+    const tx = -10 + k * 2.5;
+    c.moveTo(tx, 11 + Math.abs(tx) * -0.05);
+    c.lineTo(tx + 1.25, 14);
+  }
+  c.stroke();
+}
+// the lady on the shoulder: profile, long wavy hair, closed eye, one tear
+function lady(c) {
+  // profile, facing left
+  c.beginPath();
+  c.moveTo(-3, -22);
+  c.quadraticCurveTo(-8, -16, -8, -10);
+  c.lineTo(-14, -1);
+  c.lineTo(-9, 1);
+  c.quadraticCurveTo(-12, 4, -9, 5);
+  c.quadraticCurveTo(-11, 8, -8, 9);
+  c.quadraticCurveTo(-8, 15, -2, 16);
+  c.quadraticCurveTo(4, 16, 4, 22);
+  c.lineTo(4, 28);
+  c.stroke();
+  // bangs and the crown of the head
+  c.beginPath();
+  c.moveTo(-8, -12); c.quadraticCurveTo(-8, -26, 4, -27); c.quadraticCurveTo(16, -26, 18, -12);
+  c.stroke();
+  c.beginPath(); c.moveTo(-8, -12); c.lineTo(4, -12); c.stroke();
+  // long wavy hair down the back
+  for (let k = 0; k < 3; k++) {
+    c.beginPath();
+    const x0 = 6 + k * 6;
+    c.moveTo(x0, -16 + k * 2);
+    for (let j = 1; j <= 12; j++) c.lineTo(x0 + Math.sin(j * 1.1 + k) * 3 + j * 0.3, -16 + k * 2 + j * 3.6);
+    c.stroke();
+  }
+  // closed eye with lashes, and the tear
+  c.beginPath();
+  c.arc(-5, -6, 3.5, 0.1 * Math.PI, 0.9 * Math.PI);
+  c.moveTo(-8, -4); c.lineTo(-9.5, -1.5);
+  c.moveTo(-5, -2.6); c.lineTo(-5.5, 0);
+  c.stroke();
+  c.beginPath(); c.moveTo(-6, 2); c.quadraticCurveTo(-8.5, 6.5, -6, 7); c.quadraticCurveTo(-3.5, 6.5, -6, 2); c.stroke();
+}
+// a big luna moth, long trailing tails, a crescent moon over its head
+function moth(c) {
+  // crescent
+  c.beginPath(); c.arc(0, -27, 5, 0.15 * Math.PI, 0.85 * Math.PI, true); c.quadraticCurveTo(0, -27, 4.3, -24.5); c.stroke();
+  // body + antennae
+  c.beginPath(); c.ellipse(0, -2, 3, 13, 0, 0, Math.PI * 2); c.stroke();
+  c.beginPath(); c.moveTo(-1, -14); c.quadraticCurveTo(-5, -20, -9, -19); c.moveTo(1, -14); c.quadraticCurveTo(5, -20, 9, -19); c.stroke();
+  [-1, 1].forEach((sd) => {
+    // forewing
+    c.beginPath();
+    c.moveTo(sd * 3, -10);
+    c.quadraticCurveTo(sd * 18, -22, sd * 30, -14);
+    c.quadraticCurveTo(sd * 26, -2, sd * 3, 0);
+    c.stroke();
+    c.beginPath(); c.arc(sd * 17, -9, 3, 0, Math.PI * 2); c.stroke(); // eyespot
+    // hindwing sweeping into a long tail
+    c.beginPath();
+    c.moveTo(sd * 3, 1);
+    c.quadraticCurveTo(sd * 24, 2, sd * 18, 14);
+    c.quadraticCurveTo(sd * 12, 22, sd * 14, 30);
+    c.quadraticCurveTo(sd * 6, 22, sd * 3, 9);
+    c.stroke();
+    c.beginPath(); c.arc(sd * 13, 8, 2.4, 0, Math.PI * 2); c.stroke();
+  });
+}
+// index = the number on the flash sheet
+const SYMBOLS = [jelly, star, anchor, swallow, dagger, hands, heart, labubu, lady, moth];
+const INK = [9, 8, 7, 5]; // the patient's four tattoos: moth (chest), lady (shoulder), Labubu (upper arm), hands (forearm)
 
 function symbol(c, d, x, y, s, color, w = 3) {
   c.save();
@@ -238,7 +330,7 @@ const background = cached((c) => {
     c.stroke();
   }
   // scrawl next to the keypad
-  text(c, 'READ THE INK', KEYPAD.x - 6, KEYPAD.y + 100, { size: 18, color: 'rgba(120,20,20,0.75)', font: HAND, rot: -0.08 });
+  text(c, 'ADD UP THE INK', KEYPAD.x - 22, KEYPAD.y + 100, { size: 16, color: 'rgba(120,20,20,0.75)', font: HAND, rot: -0.08 });
 });
 
 function drawLightbox(c, t, on) {
@@ -253,26 +345,50 @@ function drawLightbox(c, t, on) {
   const buzz = 0.92 + Math.random() * 0.08;
   c.fillStyle = `rgb(${Math.floor(190 * buzz)},${Math.floor(214 * buzz)},${Math.floor(228 * buzz)})`;
   c.fillRect(x, y, w, h);
-  // the film: dark, with a forearm X-ray (elbow on the left, wrist on the right)
+  // the film: dark, a chest and left arm held out to the side
+  const fx = x + 14, fy = y + 14, fw = w - 28, fh = h - 28;
   c.fillStyle = '#0d1418';
-  c.fillRect(x + 14, y + 14, w - 28, h - 28);
+  c.fillRect(fx, fy, fw, fh);
+  c.save();
+  c.beginPath(); c.rect(fx, fy, fw, fh); c.clip();
   const cy = y + h / 2;
-  c.fillStyle = 'rgba(120,150,160,0.28)';
-  c.beginPath(); c.ellipse(x + w / 2, cy, w / 2 - 22, 52, 0, 0, Math.PI * 2); c.fill(); // soft tissue
-  c.strokeStyle = 'rgba(225,236,240,0.85)';
+  const sx = x + 112; // spine
+  const ay = cy - 34; // arm line
+  c.fillStyle = 'rgba(120,150,160,0.28)'; // soft tissue
+  c.beginPath(); c.ellipse(sx, cy + 30, 92, 110, 0, 0, Math.PI * 2); c.fill();
+  rr(c, sx + 60, ay - 26, fw, 52, 24); c.fill();
+  c.strokeStyle = 'rgba(225,236,240,0.55)';
   c.lineCap = 'round';
-  c.lineWidth = 12;
-  c.beginPath(); c.moveTo(x + 36, cy - 14); c.lineTo(x + w - 60, cy - 18); c.stroke(); // radius
-  c.lineWidth = 10;
-  c.beginPath(); c.moveTo(x + 30, cy + 14); c.lineTo(x + w - 60, cy + 16); c.stroke(); // ulna
-  c.fillStyle = 'rgba(225,236,240,0.8)';
-  for (let k = 0; k < 6; k++) { c.beginPath(); c.arc(x + w - 46 + (k % 2) * 12, cy - 20 + Math.floor(k / 2) * 18, 6, 0, Math.PI * 2); c.fill(); }
-  // the tattoos, glowing ink in the skin, read left to right
-  CODE.split('').forEach((d, i) => {
-    symbol(c, Number(d), x + 70 + i * 62, cy + (i % 2 ? 4 : -4), 0.9, 'rgba(30,240,200,0.9)', 3);
-  });
-  text(c, 'L', x + 26, y + 30, { size: 16, color: 'rgba(230,240,240,0.8)' });
-  text(c, 'RM 13 · NO NAME', x + w - 80, y + h - 26, { size: 11, color: 'rgba(230,240,240,0.6)' });
+  // spine
+  c.lineWidth = 9;
+  for (let k = 0; k < 9; k++) { c.beginPath(); c.moveTo(sx, fy + 4 + k * 20); c.lineTo(sx, fy + 18 + k * 20); c.stroke(); }
+  // ribs
+  c.lineWidth = 4;
+  for (let k = 0; k < 6; k++) {
+    const ry = cy - 44 + k * 22;
+    const rw = 56 + Math.min(k, 3) * 8;
+    [-1, 1].forEach((sd) => { c.beginPath(); c.moveTo(sx, ry); c.quadraticCurveTo(sx + sd * rw, ry - 12, sx + sd * (rw - 8), ry + 22); c.stroke(); });
+  }
+  // collarbones, shoulder, humerus, forearm
+  c.strokeStyle = 'rgba(225,236,240,0.85)';
+  c.lineWidth = 7;
+  c.beginPath(); c.moveTo(sx - 8, fy + 16); c.quadraticCurveTo(sx - 40, fy + 8, sx - 78, fy + 18); c.stroke();
+  c.beginPath(); c.moveTo(sx + 8, fy + 16); c.quadraticCurveTo(sx + 40, fy + 8, sx + 76, ay - 12); c.stroke();
+  c.fillStyle = 'rgba(225,236,240,0.85)';
+  c.beginPath(); c.arc(sx + 84, ay, 11, 0, Math.PI * 2); c.fill();
+  c.lineWidth = 11;
+  c.beginPath(); c.moveTo(sx + 92, ay + 2); c.lineTo(sx + 168, ay + 4); c.stroke();
+  c.lineWidth = 7;
+  c.beginPath(); c.moveTo(sx + 174, ay - 4); c.lineTo(fx + fw, ay - 6); c.moveTo(sx + 174, ay + 10); c.lineTo(fx + fw, ay + 10); c.stroke();
+  // the tattoos, glowing ink in the skin
+  const ink = 'rgba(30,240,200,0.9)';
+  symbol(c, INK[0], sx, cy + 22, 1.75, ink, 3.2); // luna moth across the chest
+  symbol(c, INK[1], sx + 78, ay, 0.78, ink, 2.6); // lady on the shoulder
+  symbol(c, INK[2], sx + 132, ay + 1, 0.72, ink, 2.6); // Labubu on the upper arm
+  symbol(c, INK[3], sx + 186, ay + 2, 0.72, ink, 2.6); // hands-face on the forearm
+  c.restore();
+  text(c, 'L', x + w - 30, y + h - 34, { size: 16, color: 'rgba(230,240,240,0.8)' });
+  text(c, 'RM 13 · NO NAME', x + w - 84, y + 26, { size: 11, color: 'rgba(230,240,240,0.6)' });
 }
 
 function lampLevel(t) {
@@ -328,7 +444,7 @@ export default {
     c.fillRect(6, 12, CHART.w - 12, CHART.h - 18);
     c.fillStyle = '#999';
     c.fillRect(22, 4, 26, 10);
-    for (let k = 0; k < 4; k++) symbol(c, [1, 3, 6, 9][k], 20 + (k % 2) * 30, 36 + Math.floor(k / 2) * 32, 0.38, '#2a2a2a', 1.5);
+    for (let k = 0; k < 4; k++) symbol(c, [2, 7, 0, 9][k], 20 + (k % 2) * 30, 36 + Math.floor(k / 2) * 32, 0.38, '#2a2a2a', 1.5);
     c.restore();
     // curtain sways
     const sway = Math.sin(t / 1300) * 4 + (g.flag('curtain') ? Math.sin(t / 240) * 3 : 0);
@@ -407,7 +523,7 @@ function toggleLightbox(g) {
     g.set('xraySeen');
     g.shake(150);
     g.say([
-      'The light box buzzes on. There’s a film clipped to it: an X-ray of somebody’s forearm.',
+      'The light box buzzes on. There’s a film clipped to it: an X-ray of somebody’s chest and arm.',
       'Four small shapes glow on the skin, right over the bones. Tattoos. Ink shouldn’t show up on an X-ray.',
       'These do.',
     ]);
@@ -419,7 +535,11 @@ function clickLightbox(g) {
     g.say(['A wall-mounted X-ray light box. It’s off. The switch is right beside it.']);
     return;
   }
-  g.say(['Four tattoos, in a row, elbow to wrist: a rose, a jellyfish, another jellyfish, a crescent moon.', 'Somebody wanted these to be read in order.']);
+  g.say([
+    'Four tattoos glow through the film. Across the chest, a huge luna moth with a crescent moon over its head.',
+    'On the shoulder, a woman’s face, eyes closed, one tear. Down the arm: a grinning Labubu, then a face held in two hands, a scribble where its thoughts should be.',
+    'You know these. You’ve seen them in the mirror.',
+  ]);
 }
 
 function clickJar(g) {
@@ -435,9 +555,9 @@ function openChart(g) {
   const html = `
     <h2>PATIENT CHART · RM 13</h2>
     <p class="sub">Patient: <i>name scratched out</i> · Allergies: none · Diet: espresso<br>
-    Identifying marks: tattoos, see sketch. Patient says the designs “add up.”</p>
+    Identifying marks: tattoos, see sketch. Patient says the designs “add up.” Age: <i>turning it tomorrow</i>.</p>
     <canvas id="flash" width="620" height="300" style="width:min(620px,84vw);background:#e9dfc6;border:1px solid #6b5a40"></canvas>
-    <p class="sub">Scribbled under the sketch: <i>“every design has its number.”</i></p>
+    <p class="sub">Scribbled under the sketch: <i>“every design has its number. add up the ink.”</i></p>
     <button type="button" id="fl-x">Put the chart back</button>`;
   g.ui.custom(html, (card, close) => {
     const cv = card.querySelector('#flash');
@@ -479,7 +599,7 @@ function clickDoor(g) {
   }
   g.ui.keypad({
     title: 'RECOVERY 13 · EXIT',
-    sub: 'Someone has scrawled beside the keypad: READ THE INK.',
+    sub: 'Someone has scrawled beside the keypad: ADD UP THE INK. Only two digits.',
     code: CODE,
     onSuccess: () => {
       g.audio.unlock();
@@ -493,7 +613,7 @@ function clickDoor(g) {
     },
     onFail: () => {
       g.set('recoveryTries', (g.state.flags.recoveryTries || 0) + 1);
-      if (g.state.flags.recoveryTries === 3) g.ui.toast('The chart says what each design means. Something else shows the designs.');
+      if (g.state.flags.recoveryTries === 3) g.ui.toast('The chart gives each design a number. The X-ray shows which four. Add them up.');
     },
   });
 }
