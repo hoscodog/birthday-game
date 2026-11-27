@@ -33,7 +33,8 @@ export const POEM_PAGES = [
     title: 'IV. What We Are Building',
     stanzas: [
       ['There’s something special in the way you love,', 'In the faith that guides your heart.', 'The way you love God, and live with purpose,', 'Is one of the things that sets you apart.'],
-      ['You give your all to what we’re building,', 'You treat our future with respect.', 'And through whatever life may bring us,', 'You’ll always be the one I protect.'],
+      ['You taught me that with God beside us,', 'There isn’t any night too long.', 'You kept your light through your hardest years,', 'And came out shining, kind, and strong.'],
+      ['You give your all to building forever,', 'You treat our future with respect.', 'And through whatever life may bring us,', 'You’ll always be the one I protect.'],
       ['And I feel lucky, more than words can say,', 'To have someone who loves this way.', 'Someone who sees what we could be,', 'And chooses us, day after day, with me.'],
     ],
   },
