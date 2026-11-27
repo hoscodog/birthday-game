@@ -50,6 +50,7 @@ export const POEM_PAGES = [
     title: 'VI. Happy Birthday, My Love',
     stanzas: [
       ['So here’s to you, and all you’re becoming,', 'To every dream you’re reaching for.', 'To all the laughter still awaiting,', 'And all the love we have in store.'],
+      ['Two candles on the cake tonight,', 'A two, a nine, and how they shine', 'For the bravest, kindest, funniest woman.', 'And somehow, love, that woman’s mine.'],
       ['I hope your twenty-ninth brings happiness', 'That you so freely give away.', 'I hope you feel how much you’re cherished,', 'Not just today, but every day.'],
     ],
   },
