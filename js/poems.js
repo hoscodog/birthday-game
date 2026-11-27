@@ -5,9 +5,11 @@ export const POEM_PAGES = [
     title: 'I. The Girl I Fell For',
     stanzas: [
       ['Some people enter life like a whisper,', 'Some arrive and leave a mark.', 'Some bring a little light into the darkness,', 'And some, like you, become the spark.'],
-      ['Your loyalty is something I admire,', 'Your strength is something I respect.', 'The way you chase the things you dream of', 'Is something I could never forget.'],
+      ['There’s a date cut deep into this bench, love,', 'One-twenty, carved inside a heart.', 'The day you said that you were mine,', 'The day the rest of this could start.'],
+      ['Clinicals at dawn, then work on top,', 'You fought for every hard-won day.', 'And now the scrubs inside this locker', 'Prove all that strength along the way.'],
       ['And when the world gets heavy on your shoulders,', 'You somehow find a reason we can smile.', 'You make the hardest days feel lighter,', 'And make the longest roads worthwhile.'],
       ['And yes, you’re gorgeous, and damn dummy thicc,', 'So sexy it’s honestly kind of sick.', 'And every one of your wormies, I swear,', 'I’d kiss like it’s the only one there.'],
+      ['And if the dark gets thick around you,', 'Just follow where the red yarn goes.', 'I’ve held the other end since January,', 'And I am never letting go.'],
     ],
   },
   {
