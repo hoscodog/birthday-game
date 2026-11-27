@@ -50,7 +50,7 @@ assets/               optional photos for the finale (see below)
 
 Put photos in `assets/` named `photo1.jpg`, `photo2.jpg`, ... up to `photo8` (`.png` works too). The first three hang as polaroids in the finale, and all of them show on the last screen. Nothing breaks if there are none.
 
-The song button links to a YouTube search for "Wes Anderson" by Alex Lahey. To use a direct link, change `SONG_URL` at the top of `js/scenes/or.js`.
+When the lights come on, "Wes Anderson" by Alex Lahey starts playing in a Spotify player in the bottom-right corner (the track is set at the top of `js/scenes/or.js`). Spotify plays the full song only if she's logged in to Spotify in that browser; otherwise it plays a 30-second preview. If the player can't load at all, a music-box Happy Birthday plays instead, and the last screen's "Open in Spotify" link still works.
 
 ## Deploy
 

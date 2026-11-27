@@ -5,8 +5,48 @@
 import { rr, tiles, stains, text, cached, rng, dog, partyHat, paleHand, candle, HAND } from '../draw.js';
 import { POEM_PAGES, FINAL_VERSE } from '../poems.js';
 
-// Swap this for a direct Spotify / YouTube link to the song if you like.
-const SONG_URL = 'https://www.youtube.com/results?search_query=Alex+Lahey+Wes+Anderson';
+// "Wes Anderson" by Alex Lahey. It plays in a Spotify embed the moment the lights come on.
+const SONG_URL = 'https://open.spotify.com/track/1Nlk3KvJVeqakRGI0pdbXS';
+const SONG_URI = 'spotify:track:1Nlk3KvJVeqakRGI0pdbXS';
+
+/* ---------- the song ---------- */
+// The Spotify player is loaded (hidden) as soon as she reaches the OR, so it's ready to start the instant the
+// handshake lands. That click counts as the user gesture browsers want before they allow sound.
+let spotify = null;
+let wantPlay = false;
+let playerBox = null;
+
+function loadSpotify() {
+  if (playerBox) return;
+  playerBox = document.createElement('div');
+  playerBox.id = 'spotify';
+  const slot = document.createElement('div');
+  playerBox.appendChild(slot);
+  document.body.insertBefore(playerBox, document.getElementById('toast'));
+  window.onSpotifyIframeApiReady = (api) => {
+    api.createController(slot, { uri: SONG_URI, width: 320, height: 80 }, (ctl) => {
+      spotify = ctl;
+      if (wantPlay) ctl.play();
+    });
+  };
+  const sc = document.createElement('script');
+  sc.src = 'https://open.spotify.com/embed/iframe-api/v1';
+  sc.async = true;
+  document.head.appendChild(sc);
+}
+
+function showPlayer() {
+  loadSpotify();
+  playerBox.classList.add('show');
+}
+
+// Returns false if the player never loaded (offline, blocked), so the caller can fall back.
+function playSong() {
+  showPlayer();
+  wantPlay = true;
+  if (spotify) { spotify.play(); return true; }
+  return false;
+}
 
 const DOORS = { x: 40, y: 240, w: 240, h: 420 };
 const UNDER_DOOR = { x: 90, y: 660, w: 150, h: 60 };
@@ -398,6 +438,8 @@ export default {
   darkness: (g) => (g.flag('party') ? 0 : g.flag('blackout') ? 1 : 0.97),
 
   enter(g) {
+    loadSpotify();
+    if (g.flag('party')) showPlayer();
     if (g.flag('blackout')) {
       g.audio.stopEvents();
       g.audio.ambientLevel(0, 0.5);
@@ -584,7 +626,8 @@ function handshake(g) {
       partyAt = performance.now();
       g.audio.lightsOn();
       g.audio.bark();
-      setTimeout(() => g.audio.happyBirthday(), 900);
+      // Our song, straight away. If Spotify couldn't load, a music-box Happy Birthday plays instead.
+      if (!playSong()) setTimeout(() => { if (!spotify) g.audio.happyBirthday(); }, 900);
       g.recharge();
       g.say([
         'Dap. Bump. Finger guns. You blow the smoke off your fingertip, and somewhere in the dark, someone laughs.',
@@ -651,12 +694,16 @@ function finalScreen(g) {
     </div>
     ${pics.length ? `<div class="photo-row">${pics.map((p) => `<img src="${p.src}" alt="">`).join('')}</div>` : ''}
     <div class="final-buttons">
-      <a class="btn" href="${SONG_URL}" target="_blank" rel="noopener">♪ Play our song</a>
+      <button type="button" class="btn" id="fn-song">♪ Play our song</button>
+      <a class="ghost-link" href="${SONG_URL}" target="_blank" rel="noopener">Open in Spotify</a>
       <button type="button" id="fn-pages">Read all the pages</button>
       <button type="button" class="ghost" id="fn-x">Stay at the party</button>
     </div>`;
   g.ui.custom(html, (card, close) => {
     card.querySelector('#fn-x').onclick = close;
+    card.querySelector('#fn-song').onclick = () => {
+      if (spotify) spotify.play(); else window.open(SONG_URL, '_blank', 'noopener');
+    };
     card.querySelector('#fn-pages').onclick = () => {
       close();
       g.audio.paper();
